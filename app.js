@@ -1,10 +1,8 @@
 // Holographic Tarot Explorer Logic (offline)
 // Data and graph logic with additional connection types
 
-const GEMATRIA_VALUES = { "Aleph": 1, "Beth": 2, "Gimel": 3, "Daleth": 4, "Heh": 5, "Vau": 6, "Zain": 7, "Cheth": 8, "Teth": 9, "Yod": 10, "Kaph": 20, "Lamed": 30, "Mem": 40, "Nun": 50, "Samekh": 60, "Ayin": 70, "Peh": 80, "Tzaddi": 90, "Koph": 100, "Resh": 200, "Shin": 300, "Tau": 400 };
 const ASTROLOGICAL_OPPOSITES = { "Aries": "Libra", "Libra": "Aries", "Taurus": "Scorpio", "Scorpio": "Taurus", "Gemini": "Sagittarius", "Sagittarius": "Gemini", "Cancer": "Capricorn", "Capricorn": "Cancer", "Leo": "Aquarius", "Aquarius": "Leo", "Virgo": "Pisces", "Pisces": "Virgo" };
 const KABBALISTIC_COMPLEMENTARY_SEPHIROTH = [ new Set(["Kether", "Malkuth"]), new Set(["Chokmah", "Binah"]), new Set(["Chesed", "Geburah"]), new Set(["Netzach", "Hod"]) ];
-const UNIVERSAL_ARCHETYPAL_PRINCIPLES = [ "Initiation", "Will", "Intuition", "Nurturing", "Structure", "Guidance", "Choice", "Control", "Courage", "Introspection", "Cycles", "Balance", "Perspective", "Transformation", "Harmony", "Shadow", "Revelation", "Hope", "Subconscious", "Clarity", "Awakening", "Completion", "Chaos", "Order", "Freedom", "Constraint", "Growth", "Decay", "Light", "Darkness", "Emanation", "Containment", "DivineFlow", "Manifestation", "Concealment" ];
 
 // majorArcanaData is large: inserted below
 const majorArcanaData = [
@@ -54,7 +52,10 @@ function buildGraphData() {
       if (c1Zodiac in ASTROLOGICAL_OPPOSITES && ASTROLOGICAL_OPPOSITES[c1Zodiac] === c2Zodiac) types.add("Astrological Opposition");
       // complementary sephiroth
       KABBALISTIC_COMPLEMENTARY_SEPHIROTH.forEach(pair => {
-        if (pair.has(card1.path_from_sephirah) && pair.has(card2.path_to_sephirah)) types.add("Complementary Sephiroth");
+        if ((pair.has(card1.path_from_sephirah) && pair.has(card2.path_to_sephirah)) ||
+            (pair.has(card1.path_to_sephirah) && pair.has(card2.path_from_sephirah))) {
+          types.add("Complementary Sephiroth");
+        }
       });
       // gematria resonance
       if (Math.abs(card1.gematria_value - card2.gematria_value) <= 5) types.add("Gematria Resonance");
@@ -164,9 +165,12 @@ const resetBtn = d3.select('#reset-btn');
 let selectionHistory = [];
 
 const simulation = d3.forceSimulation(nodes)
-  .force('link', d3.forceLink(links).id(d=>d.id).strength(0.05).distance(200))
+  .force('link', d3.forceLink(links)
+    .id(d => d.id)
+    .strength(d => 0.02 * d.weight)
+    .distance(d => 260 - d.weight * 20))
   .force('charge', d3.forceManyBody().strength(-250))
-  .force('center', d3.forceCenter(width/2, height/2));
+  .force('center', d3.forceCenter(width / 2, height / 2));
 
 const linkGroup = svg.append('g').attr('class','links');
 const nodeGroup = svg.append('g').attr('class','nodes');
@@ -238,7 +242,9 @@ function updateFocusState() {
     narrativeHub.classed('show', false);
     nodeSelection.attr('class','node').select('circle').attr('r',12);
     linkSelection.attr('class','link');
-    simulation.force('link').strength(0.05).distance(200);
+    simulation.force('link')
+      .strength(d => 0.02 * d.weight)
+      .distance(d => 260 - d.weight * 20);
     simulation.force('charge').strength(-250);
     simulation.force('center', d3.forceCenter(width/2, height/2));
   } else {
@@ -276,8 +282,9 @@ function updateFocusState() {
       return 'link';
     });
     simulation.force('center', null);
-    simulation.force('link').strength(l => focusIds.has(l.source.id) || focusIds.has(l.target.id) ? 0.6 : 0.01)
-      .distance(l => focusIds.has(l.source.id) || focusIds.has(l.target.id) ? 120 : 300);
+    simulation.force('link')
+      .strength(l => (focusIds.has(l.source.id) || focusIds.has(l.target.id)) ? 0.1 * l.weight : 0.02 * l.weight)
+      .distance(l => (focusIds.has(l.source.id) || focusIds.has(l.target.id)) ? 120 : 260 - l.weight * 20);
     simulation.force('charge').strength(d => focusIds.has(d.id) ? -1000 : -150);
   }
   simulation.alpha(1).restart();

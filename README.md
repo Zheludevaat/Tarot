@@ -18,12 +18,13 @@ This project packages the **Holographic Tarot Explorer** as a small desktop appl
      This fetches the Electron runtime. Once done the app works without internet access.
 4. **Start the explorer**
    ```bash
-   npm start
-   ```
-   If an error mentions running as root without a sandbox, use:
-   ```bash
-   npm start -- --no-sandbox
-   ```
+  npm start
+  ```
+  If an error mentions running as root without a sandbox, use:
+  ```bash
+  npm start -- --no-sandbox
+  ```
+   A graphical desktop environment (Windows, macOS or a Linux desktop session) is required. Headless servers will not display the window.
 
 A window will open displaying `index.html` with the interactive tarot visualization.
 
