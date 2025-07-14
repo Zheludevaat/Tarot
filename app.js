@@ -94,13 +94,16 @@ function assignAndNormalizeWeights(nodes, links) {
 }
 function generateSingleCardInterpretation(card) {
   const principles = Object.entries(card.archetypal_principles)
-    .filter(([,v]) => v !== 0)
-    .map(([k,v]) => `<li><strong>${k}:</strong> ${v === 1 ? 'A dominant force' : 'A shadow influence'}</li>`)
+    .filter(([, v]) => v !== 0)
+    .map(
+      ([k, v]) =>
+        `<li><strong>${k}:</strong> ${v === 1 ? 'A dominant force' : 'A shadow influence'}</li>`
+    )
     .join('');
-  return `\n<div class="narrative-pane active" id="pane-${card.id.replace(/\s+/g,'-')}">\n  <h2 class="text-2xl mb-4"><span class="font-bold title-font text-xl" style="color:${card.color};">${card.name}</span></h2>\n  <p class="text-gray-300 text-sm leading-relaxed mb-4">At its heart, this card embodies the archetype of <strong>${card.core_theme.neutral}</strong>. This manifests as the potential for <strong>${card.core_theme.positive}</strong> when embraced, but can fall into the shadow of <strong>${card.core_theme.negative}</strong>.</p>\n  <h3 class="font-bold title-font text-lg text-gray-100 mb-2">Key Archetypal Principles</h3>\n  <ul class="list-disc list-inside text-sm text-gray-300 mb-4">${principles}</ul>\n  <h3 class="font-bold title-font text-lg text-gray-100 mb-2">Symbolic Language</h3>\n  <p class="text-gray-300 text-sm leading-relaxed mb-4">The card speaks through its unique symbols: <strong>${card.unique_symbols.join(', ')}</strong>. Its geometry of <em>${card.primary_geometry_type}</em> and fractal pattern <em>${card.primary_fractal_pattern}</em> deepen the message.</p>\n  <h3 class="font-bold title-font text-lg text-gray-100 mb-2">Esoteric Framework</h3>\n  <p class="text-gray-300 text-sm leading-relaxed">Aligned with <strong>${card.astrological_correspondence}</strong>, it follows Kabbalistic Path ${card.kabbalistic_path_number} from ${card.path_from_sephirah} to ${card.path_to_sephirah}, guided by ${card.hebrew_letter}.</p>\n</div>`;
+  return `\n  <h2 class="text-2xl mb-4"><span class="font-bold title-font text-xl" style="color:${card.color};">${card.name}</span></h2>\n  <p class="text-gray-300 text-sm leading-relaxed mb-4">At its heart, this card embodies the archetype of <strong>${card.core_theme.neutral}</strong>. This manifests as the potential for <strong>${card.core_theme.positive}</strong> when embraced, but can fall into the shadow of <strong>${card.core_theme.negative}</strong>.</p>\n  <h3 class="font-bold title-font text-lg text-gray-100 mb-2">Key Archetypal Principles</h3>\n  <ul class="list-disc list-inside text-sm text-gray-300 mb-4">${principles}</ul>\n  <h3 class="font-bold title-font text-lg text-gray-100 mb-2">Symbolic Language</h3>\n  <p class="text-gray-300 text-sm leading-relaxed mb-4">The card speaks through its unique symbols: <strong>${card.unique_symbols.join(', ')}</strong>. Its geometry of <em>${card.primary_geometry_type}</em> and fractal pattern <em>${card.primary_fractal_pattern}</em> deepen the message.</p>\n  <h3 class="font-bold title-font text-lg text-gray-100 mb-2">Esoteric Framework</h3>\n  <p class="text-gray-300 text-sm leading-relaxed">Aligned with <strong>${card.astrological_correspondence}</strong>, it follows Kabbalistic Path ${card.kabbalistic_path_number} from ${card.path_from_sephirah} to ${card.path_to_sephirah}, guided by ${card.hebrew_letter}.</p>\n`;
 }
 function generateCombinationInterpretation(cards, allLinks) {
-  let html = `<div class="narrative-pane active" id="pane-constellation">`;
+  let html = '';
   const header = cards.map(c => `<span class="font-bold title-font text-xl" style="color:${c.color};">${c.name}</span>`).join(' & ');
   html += `<h2 class="text-2xl mb-4">${header}</h2>`;
   const themes = cards.map(c => `<strong>${c.core_theme.neutral}</strong>`).join(' and ');
@@ -143,7 +146,7 @@ function generateCombinationInterpretation(cards, allLinks) {
       }
     }
   }
-  html += '</ul></div>';
+  html += '</ul>';
   return html;
 }
 const { nodes, links } = buildGraphData();
