@@ -7,14 +7,40 @@ const KABBALISTIC_COMPLEMENTARY_SEPHIROTH = [ new Set(["Kether", "Malkuth"]), ne
 const UNIVERSAL_ARCHETYPAL_PRINCIPLES = [ "Initiation", "Will", "Intuition", "Nurturing", "Structure", "Guidance", "Choice", "Control", "Courage", "Introspection", "Cycles", "Balance", "Perspective", "Transformation", "Harmony", "Shadow", "Revelation", "Hope", "Subconscious", "Clarity", "Awakening", "Completion", "Chaos", "Order", "Freedom", "Constraint", "Growth", "Decay", "Light", "Darkness", "Emanation", "Containment", "DivineFlow", "Manifestation", "Concealment" ];
 
 const PRINCIPLE_EXPLANATIONS = {
+  Initiation: "The spark that launches a new journey.",
   Will: "The drive that shapes reality through intention.",
   Intuition: "Understanding that emerges beyond rational thought.",
+  Nurturing: "Compassionate support that fosters growth.",
+  Structure: "Order and form that create stability.",
   Guidance: "A source of direction lighting the path forward.",
+  Choice: "Decision points that define one's path.",
+  Control: "The ability to influence or restrain forces.",
+  Courage: "Bravery in the face of uncertainty.",
   Introspection: "Turning inward to gain self-knowledge.",
+  Cycles: "Recurring phases that shape experience.",
+  Balance: "Dynamic equilibrium among forces.",
   Perspective: "The vantage point from which events are interpreted.",
+  Transformation: "Profound change from one state to another.",
+  Harmony: "Alignment that creates synergy.",
+  Shadow: "Hidden aspects revealing unresolved issues.",
+  Revelation: "Sudden clarity unveiling deeper truth.",
+  Hope: "Expectation that guides toward better outcomes.",
   Subconscious: "Hidden influences beneath conscious awareness.",
+  Clarity: "Seeing circumstances without distortion.",
+  Awakening: "Realization that opens new awareness.",
+  Completion: "The fulfillment of a cycle or goal.",
+  Chaos: "Disruptive energy that sparks renewal.",
+  Order: "Structured arrangement fostering predictability.",
+  Freedom: "Ability to act without restraint.",
+  Constraint: "Limitations that shape possibilities.",
+  Growth: "Expansion and development over time.",
+  Decay: "Breaking down to make room for renewal.",
+  Light: "Illumination and conscious awareness.",
   Darkness: "The unknown aspects that challenge perception.",
+  Emanation: "Outward flow from a central source.",
   Containment: "Boundaries that restrict or hold energy in place.",
+  DivineFlow: "Effortless movement guided by higher forces.",
+  Manifestation: "Bringing ideas into tangible form.",
   Concealment: "The deliberate hiding of truths or intentions."
 };
 
@@ -237,14 +263,17 @@ function assignAndNormalizeWeights(nodes, links) {
 function generateSingleCardInterpretation(card) {
   const principles = Object.entries(card.archetypal_principles)
     .filter(([, v]) => v !== 0)
-    .map(([k, v]) =>
-      `<details class="mb-1"><summary class="cursor-pointer"><strong>${k}:</strong> ${v === 1 ? 'A dominant force' : 'A shadow influence'}</summary><div class="text-gray-400 pl-4 mt-1">${PRINCIPLE_EXPLANATIONS[k] || ''}</div></details>`
-    )
+    .map(([k, v]) => {
+      const label = v > 0 ? 'Dominant' : 'Shadow';
+      const color = v > 0 ? 'text-green-400' : 'text-red-400';
+      return `<details class="mb-1"><summary class="cursor-pointer"><strong>${k}:</strong> <span class="${color} font-medium">${label}</span></summary><div class="text-gray-400 pl-4 mt-1">${PRINCIPLE_EXPLANATIONS[k] || ''}</div></details>`;
+    })
     .join('');
   return `
   <h2 class="text-2xl mb-4"><span class="font-bold title-font text-xl" style="color:${card.color};">${card.name}</span></h2>
   <p class="text-gray-300 text-sm leading-relaxed mb-4">At its heart, this card embodies the archetype of <strong>${card.core_theme.neutral}</strong>. This manifests as the potential for <strong>${card.core_theme.positive}</strong> when embraced, but can fall into the shadow of <strong>${card.core_theme.negative}</strong>.</p>
   <h3 class="font-bold title-font text-lg text-gray-100 mb-2">Key Archetypal Principles</h3>
+  <p class="text-xs text-gray-400 mb-1">Dominant principles appear in <span class="text-green-400">green</span>; shadow influences in <span class="text-red-400">red</span>.</p>
   <div class="text-sm text-gray-300 mb-4 space-y-2">${principles}</div>
   <h3 class="font-bold title-font text-lg text-gray-100 mb-2">Symbolic Language</h3>
   <details class="mb-4"><summary class="cursor-pointer text-gray-300 text-sm leading-relaxed">The card speaks through various motifs.</summary>
@@ -280,12 +309,14 @@ function generateCombinationInterpretation(cards, allLinks) {
   const comboPrinciples = Object.entries(combined)
     .filter(([, v]) => v !== 0)
     .map(([k, v]) => {
-      const desc = v > 0 ? 'Shared dominance' : 'Collective shadow';
-      return `<details class="mb-1"><summary class="cursor-pointer"><strong>${k}:</strong> ${desc}</summary><div class="text-gray-400 pl-4 mt-1">${PRINCIPLE_EXPLANATIONS[k] || ''}</div></details>`;
+      const label = v > 0 ? 'Shared Dominance' : 'Collective Shadow';
+      const color = v > 0 ? 'text-green-400' : 'text-red-400';
+      return `<details class="mb-1"><summary class="cursor-pointer"><strong>${k}:</strong> <span class="${color} font-medium">${label}</span></summary><div class="text-gray-400 pl-4 mt-1">${PRINCIPLE_EXPLANATIONS[k] || ''}</div></details>`;
     })
     .join('');
   if (comboPrinciples) {
     html += `<h3 class="font-bold title-font text-lg text-gray-100 mb-2">Combined Archetypal Currents</h3>`;
+    html += `<p class="text-xs text-gray-400 mb-1">Green indicates mutually reinforcing traits; red shows shared challenges.</p>`;
     html += `<div class="text-sm text-gray-300 mb-4 space-y-2">${comboPrinciples}</div>`;
   }
   html += `<h3 class="font-bold title-font text-lg text-gray-100 mb-2">Points of Interaction</h3>`;
