@@ -18,6 +18,23 @@ const PRINCIPLE_EXPLANATIONS = {
   Concealment: "The deliberate hiding of truths or intentions."
 };
 
+const CONNECTION_EXPLANATIONS = {
+  "Fractal Embedding":
+    "One card's patterns appear inside the other, mirroring its essence in fractal form.",
+  "Symbol Echo":
+    "Shared iconography resonates between the cards, reinforcing their themes.",
+  "Shared Geometry":
+    "Identical geometric forms create structural harmony across the cards.",
+  "Shared Astrology":
+    "A common celestial influence guides both cards' energies.",
+  "Astrological Opposition":
+    "Opposing zodiac signs create tension that sparks dynamic growth.",
+  "Complementary Sephiroth":
+    "Kabbalistic paths complement each other, suggesting spiritual reciprocity.",
+  "Gematria Resonance":
+    "Numerical values align closely, hinting at occult synchronicity."
+};
+
 // majorArcanaData is large: inserted below
 const majorArcanaData = [
 {"name": "The Fool", "card_number": 0, "color": "#FBBF24", "core_theme": {"positive": "Innocent Potential", "neutral": "Uncharted Journey", "negative": "Reckless Folly"}, "archetypal_principles": {"Initiation": 1, "Will": 0, "Intuition": 0, "Nurturing": 0, "Structure": -1, "Guidance": 0, "Choice": 1, "Control": -1, "Courage": 1, "Introspection": 0, "Cycles": 0, "Balance": 0, "Perspective": 1, "Transformation": 0, "Harmony": 0, "Shadow": -1, "Revelation": 0, "Hope": 1, "Subconscious": 1, "Clarity": 0, "Awakening": 0, "Completion": -1, "Chaos": 1, "Order": -1, "Freedom": 1, "Constraint": -1, "Growth": 1, "Decay": 0, "Light": 1, "Darkness": 0, "Emanation": 1, "Containment": -1, "DivineFlow": 1, "Manifestation": 0, "Concealment": 0}, "fractal_signatures_embedded": ["The Magician", "The World", "Death", "The Star"], "unique_symbols": ["cliff", "white rose", "dog", "sun", "backpack", "butterfly"], "primary_geometry_type": "Mobius", "primary_fractal_pattern": "WaterRipples", "hebrew_letter": "Aleph", "gematria_value": 1, "kabbalistic_path_number": 11, "astrological_correspondence": "Element: Air", "astrological_modality": null, "path_from_sephirah": "Kether", "path_to_sephirah": "Chokmah"},
@@ -119,6 +136,23 @@ function generateCombinationInterpretation(cards, allLinks) {
   html += `<h2 class="text-2xl mb-4">${header}</h2>`;
   const themes = cards.map(c => `<strong>${c.core_theme.neutral}</strong>`).join(' and ');
   html += `<p class="text-gray-300 text-sm leading-relaxed mb-4">This constellation fuses the archetypes of ${themes}, weaving their narratives together.</p>`;
+  const combined = {};
+  cards.forEach(c => {
+    Object.entries(c.archetypal_principles).forEach(([k, v]) => {
+      combined[k] = (combined[k] || 0) + v;
+    });
+  });
+  const comboPrinciples = Object.entries(combined)
+    .filter(([, v]) => v !== 0)
+    .map(([k, v]) => {
+      const desc = v > 0 ? 'Shared dominance' : 'Collective shadow';
+      return `<details class="mb-1"><summary class="cursor-pointer"><strong>${k}:</strong> ${desc}</summary><div class="text-gray-400 pl-4 mt-1">${PRINCIPLE_EXPLANATIONS[k] || ''}</div></details>`;
+    })
+    .join('');
+  if (comboPrinciples) {
+    html += `<h3 class="font-bold title-font text-lg text-gray-100 mb-2">Combined Archetypal Currents</h3>`;
+    html += `<div class="text-sm text-gray-300 mb-4 space-y-2">${comboPrinciples}</div>`;
+  }
   html += `<h3 class="font-bold title-font text-lg text-gray-100 mb-2">Points of Interaction</h3>`;
   html += '<ul class="space-y-4 text-sm text-gray-300">';
   for (let i=0; i<cards.length; i++) {
@@ -128,31 +162,34 @@ function generateCombinationInterpretation(cards, allLinks) {
       const link = allLinks.find(l => (l.source.id===c1.id && l.target.id===c2.id) || (l.source.id===c2.id && l.target.id===c1.id));
       if (link) {
         link.types.forEach(type => {
-          let text='';
+          let summary='';
           switch(type) {
             case 'Fractal Embedding':
-              text = `A <em>Fractal Embedding</em> reveals how ${c1.name} mirrors patterns within ${c2.name}, hinting at hidden recursion in their stories.`;
+              summary = `A <em>Fractal Embedding</em> reveals how ${c1.name} mirrors patterns within ${c2.name}.`;
               break;
             case 'Symbol Echo':
-              text = `Shared symbols echo between them, showing a common thread that reinforces their mutual significance.`;
+              summary = `Shared symbols create a mutual resonance.`;
               break;
             case 'Shared Geometry':
-              text = `Their identical geometry of <strong>${c1.primary_geometry_type}</strong> creates structural harmony.`;
+              summary = `Both share the geometry of <strong>${c1.primary_geometry_type}</strong>.`;
               break;
             case 'Shared Astrology':
-              text = `Both resonate with <strong>${c1.astrological_correspondence}</strong>, amplifying this celestial influence.`;
+              summary = `Unified under <strong>${c1.astrological_correspondence}</strong>.`;
               break;
             case 'Astrological Opposition':
-              text = `Opposing zodiac forces create dynamic balance between ${c1.name} and ${c2.name}.`;
+              summary = `Opposing zodiac signs generate balanced tension.`;
               break;
             case 'Complementary Sephiroth':
-              text = `Their sephiroth paths complement one another, suggesting spiritual reciprocity.`;
+              summary = `Their sephiroth paths complete each other.`;
               break;
             case 'Gematria Resonance':
-              text = `Their gematria values nearly match, hinting at numerical synchronicity.`;
+              summary = `Gematria values closely align.`;
               break;
           }
-          if (text) html += `<li class="p-3 bg-gray-900/50 rounded-md border-l-2 border-purple-400">${text}</li>`;
+          if (summary) {
+            const explain = CONNECTION_EXPLANATIONS[type] || '';
+            html += `<li class="p-3 bg-gray-900/50 rounded-md border-l-2 border-purple-400"><details><summary class="cursor-pointer">${summary}</summary><div class="text-gray-400 mt-1 pl-2">${explain}</div></details></li>`;
+          }
         });
       }
     }
