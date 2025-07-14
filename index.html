@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Holographic Tarot Explorer</title>
+  <link rel="stylesheet" href="assets/tailwind.min.css">
+  <style>
+    body { font-family: sans-serif; overflow: hidden; background-color: #030712; }
+    .title-font { font-family: serif; }
+    #graph-container { width: 100%; height: 100%; position: absolute; top: 0; left: 0; background: radial-gradient(ellipse at bottom, #1b2735 0%, #090a0f 100%); }
+    .node circle { stroke: rgba(255, 255, 255, 0.7); stroke-width: 1.5px; transition: all 0.3s ease; cursor: pointer; }
+    .node text { pointer-events: none; font-size: 11px; fill: rgba(255, 255, 255, 0.8); text-shadow: 0 1px 4px rgba(0,0,0,0.9); font-weight: 500; transition: all 0.3s ease; }
+    .link { stroke: #4b5563; stroke-opacity: 0.5; transition: all 0.3s ease; }
+    .node.is-focus circle { stroke: #fde047; stroke-width: 3px; filter: drop-shadow(0 0 12px #fde047); }
+    .node.is-focus text { font-weight: 700; fill: #fde047; }
+    .node.is-neighbor circle { stroke: #60a5fa; stroke-width: 2px; filter: drop-shadow(0 0 5px #60a5fa); }
+    .node.is-shared-neighbor circle { stroke: #4ade80; stroke-width: 2.5px; filter: drop-shadow(0 0 8px #4ade80); }
+    .node.is-distant { opacity: 0.2; }
+    .link.is-primary { stroke: #a78bfa; stroke-opacity: 0.9; }
+    .link.is-secondary { stroke: #6b7280; stroke-opacity: 0.6; }
+    #narrative-hub { position: absolute; top: 20px; right: -500px; width: 450px; max-width: 90vw; height: calc(100vh - 40px); background: rgba(17,24,39,0.85); backdrop-filter: blur(10px); border-left: 1px solid rgba(107,114,128,0.5); border-radius: 12px 0 0 12px; transition: right 0.5s ease-in-out; display: flex; flex-direction: column; box-shadow: -10px 0 30px rgba(0,0,0,0.3); }
+    #narrative-hub.show { right: 0; }
+    #narrative-tabs { display: flex; flex-shrink: 0; border-bottom: 1px solid rgba(107,114,128,0.5); padding: 0 10px; }
+    .narrative-tab { padding: 10px 15px; cursor: pointer; color: #9ca3af; font-size: 14px; border-bottom: 2px solid transparent; transition: all 0.2s; }
+    .narrative-tab:hover { color: #e5e7eb; }
+    .narrative-tab.active { color: #fde047; border-bottom-color: #fde047; font-weight: 600; }
+    #narrative-content-area { overflow-y: auto; flex-grow: 1; }
+    .narrative-pane { padding: 20px; display: none; }
+    .narrative-pane.active { display: block; }
+    #narrative-content-area::-webkit-scrollbar { width: 5px; }
+    #narrative-content-area::-webkit-scrollbar-track { background: transparent; }
+    #narrative-content-area::-webkit-scrollbar-thumb { background: #4b5563; border-radius: 10px; }
+    #tooltip { position: absolute; visibility: hidden; background: rgba(17,24,39,0.8); backdrop-filter: blur(5px); border: 1px solid rgba(107,114,128,0.5); border-radius: 8px; padding: 12px; color: #d1d5db; font-size: 12px; max-width: 280px; pointer-events: none; transition: opacity 0.2s; opacity: 0; }
+    #controls { position: absolute; bottom: 20px; left: 50%; transform: translateX(-50%); display: flex; gap: 10px; background: rgba(17,24,39,0.5); backdrop-filter: blur(5px); padding: 8px; border-radius: 12px; border: 1px solid rgba(107,114,128,0.3); }
+    .control-btn { background-color: rgba(55,65,81,0.7); border: 1px solid rgba(107,114,128,0.5); color: #e5e7eb; padding: 8px 16px; border-radius: 8px; cursor: pointer; transition: all 0.2s; }
+    .control-btn:hover { background-color: rgba(75,85,99,0.9); border-color: #9ca3af; }
+    .control-btn:disabled { opacity: 0.5; cursor: not-allowed; }
+  </style>
+</head>
+<body>
+  <div id="graph-container"><svg id="tarot-graph" width="100%" height="100%"></svg></div>
+  <div class="absolute top-0 left-0 p-4 md:p-6 max-w-lg">
+    <h1 class="text-3xl md:text-4xl font-bold title-font text-white">Holographic Tarot Explorer</h1>
+    <p class="text-sm md:text-base text-gray-400 mt-2">Click a card to begin your journey. Click another to form a constellation and watch the story unfold.</p>
+  </div>
+  <div id="tooltip"></div>
+  <div id="narrative-hub">
+    <div id="narrative-tabs"></div>
+    <div id="narrative-content-area"></div>
+  </div>
+  <div id="controls">
+    <button id="back-btn" class="control-btn" disabled>Back</button>
+    <button id="reset-btn" class="control-btn" disabled>Reset View</button>
+  </div>
+  <script src="assets/d3.min.js"></script>
+  <script type="module" src="app.js"></script>
+</body>
+</html>
