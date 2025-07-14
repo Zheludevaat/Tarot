@@ -6,6 +6,18 @@ const ASTROLOGICAL_OPPOSITES = { "Aries": "Libra", "Libra": "Aries", "Taurus": "
 const KABBALISTIC_COMPLEMENTARY_SEPHIROTH = [ new Set(["Kether", "Malkuth"]), new Set(["Chokmah", "Binah"]), new Set(["Chesed", "Geburah"]), new Set(["Netzach", "Hod"]) ];
 const UNIVERSAL_ARCHETYPAL_PRINCIPLES = [ "Initiation", "Will", "Intuition", "Nurturing", "Structure", "Guidance", "Choice", "Control", "Courage", "Introspection", "Cycles", "Balance", "Perspective", "Transformation", "Harmony", "Shadow", "Revelation", "Hope", "Subconscious", "Clarity", "Awakening", "Completion", "Chaos", "Order", "Freedom", "Constraint", "Growth", "Decay", "Light", "Darkness", "Emanation", "Containment", "DivineFlow", "Manifestation", "Concealment" ];
 
+const PRINCIPLE_EXPLANATIONS = {
+  Will: "The drive that shapes reality through intention.",
+  Intuition: "Understanding that emerges beyond rational thought.",
+  Guidance: "A source of direction lighting the path forward.",
+  Introspection: "Turning inward to gain self-knowledge.",
+  Perspective: "The vantage point from which events are interpreted.",
+  Subconscious: "Hidden influences beneath conscious awareness.",
+  Darkness: "The unknown aspects that challenge perception.",
+  Containment: "Boundaries that restrict or hold energy in place.",
+  Concealment: "The deliberate hiding of truths or intentions."
+};
+
 // majorArcanaData is large: inserted below
 const majorArcanaData = [
 {"name": "The Fool", "card_number": 0, "color": "#FBBF24", "core_theme": {"positive": "Innocent Potential", "neutral": "Uncharted Journey", "negative": "Reckless Folly"}, "archetypal_principles": {"Initiation": 1, "Will": 0, "Intuition": 0, "Nurturing": 0, "Structure": -1, "Guidance": 0, "Choice": 1, "Control": -1, "Courage": 1, "Introspection": 0, "Cycles": 0, "Balance": 0, "Perspective": 1, "Transformation": 0, "Harmony": 0, "Shadow": -1, "Revelation": 0, "Hope": 1, "Subconscious": 1, "Clarity": 0, "Awakening": 0, "Completion": -1, "Chaos": 1, "Order": -1, "Freedom": 1, "Constraint": -1, "Growth": 1, "Decay": 0, "Light": 1, "Darkness": 0, "Emanation": 1, "Containment": -1, "DivineFlow": 1, "Manifestation": 0, "Concealment": 0}, "fractal_signatures_embedded": ["The Magician", "The World", "Death", "The Star"], "unique_symbols": ["cliff", "white rose", "dog", "sun", "backpack", "butterfly"], "primary_geometry_type": "Mobius", "primary_fractal_pattern": "WaterRipples", "hebrew_letter": "Aleph", "gematria_value": 1, "kabbalistic_path_number": 11, "astrological_correspondence": "Element: Air", "astrological_modality": null, "path_from_sephirah": "Kether", "path_to_sephirah": "Chokmah"},
@@ -95,12 +107,11 @@ function assignAndNormalizeWeights(nodes, links) {
 function generateSingleCardInterpretation(card) {
   const principles = Object.entries(card.archetypal_principles)
     .filter(([, v]) => v !== 0)
-    .map(
-      ([k, v]) =>
-        `<li><strong>${k}:</strong> ${v === 1 ? 'A dominant force' : 'A shadow influence'}</li>`
+    .map(([k, v]) =>
+      `<details class="mb-1"><summary class="cursor-pointer"><strong>${k}:</strong> ${v === 1 ? 'A dominant force' : 'A shadow influence'}</summary><div class="text-gray-400 pl-4 mt-1">${PRINCIPLE_EXPLANATIONS[k] || ''}</div></details>`
     )
     .join('');
-  return `\n  <h2 class="text-2xl mb-4"><span class="font-bold title-font text-xl" style="color:${card.color};">${card.name}</span></h2>\n  <p class="text-gray-300 text-sm leading-relaxed mb-4">At its heart, this card embodies the archetype of <strong>${card.core_theme.neutral}</strong>. This manifests as the potential for <strong>${card.core_theme.positive}</strong> when embraced, but can fall into the shadow of <strong>${card.core_theme.negative}</strong>.</p>\n  <h3 class="font-bold title-font text-lg text-gray-100 mb-2">Key Archetypal Principles</h3>\n  <ul class="list-disc list-inside text-sm text-gray-300 mb-4">${principles}</ul>\n  <h3 class="font-bold title-font text-lg text-gray-100 mb-2">Symbolic Language</h3>\n  <p class="text-gray-300 text-sm leading-relaxed mb-4">The card speaks through its unique symbols: <strong>${card.unique_symbols.join(', ')}</strong>. Its geometry of <em>${card.primary_geometry_type}</em> and fractal pattern <em>${card.primary_fractal_pattern}</em> deepen the message.</p>\n  <h3 class="font-bold title-font text-lg text-gray-100 mb-2">Esoteric Framework</h3>\n  <p class="text-gray-300 text-sm leading-relaxed">Aligned with <strong>${card.astrological_correspondence}</strong>, it follows Kabbalistic Path ${card.kabbalistic_path_number} from ${card.path_from_sephirah} to ${card.path_to_sephirah}, guided by ${card.hebrew_letter}.</p>\n`;
+  return `\n  <h2 class="text-2xl mb-4"><span class="font-bold title-font text-xl" style="color:${card.color};">${card.name}</span></h2>\n  <p class="text-gray-300 text-sm leading-relaxed mb-4">At its heart, this card embodies the archetype of <strong>${card.core_theme.neutral}</strong>. This manifests as the potential for <strong>${card.core_theme.positive}</strong> when embraced, but can fall into the shadow of <strong>${card.core_theme.negative}</strong>.</p>\n  <h3 class="font-bold title-font text-lg text-gray-100 mb-2">Key Archetypal Principles</h3>\n  <div class="text-sm text-gray-300 mb-4 space-y-2">${principles}</div>\n  <h3 class="font-bold title-font text-lg text-gray-100 mb-2">Symbolic Language</h3>\n  <p class="text-gray-300 text-sm leading-relaxed mb-4">The card speaks through its unique symbols: <strong>${card.unique_symbols.join(', ')}</strong>. Its geometry of <em>${card.primary_geometry_type}</em> and fractal pattern <em>${card.primary_fractal_pattern}</em> deepen the message.</p>\n  <h3 class="font-bold title-font text-lg text-gray-100 mb-2">Esoteric Framework</h3>\n  <p class="text-gray-300 text-sm leading-relaxed">Aligned with <strong>${card.astrological_correspondence}</strong>, it follows Kabbalistic Path ${card.kabbalistic_path_number} from ${card.path_from_sephirah} to ${card.path_to_sephirah}, guided by ${card.hebrew_letter}.</p>\n`;
 }
 function generateCombinationInterpretation(cards, allLinks) {
   let html = '';
