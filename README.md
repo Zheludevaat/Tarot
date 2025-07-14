@@ -9,21 +9,17 @@ This project packages the **Holographic Tarot Explorer** as a small desktop appl
    - Run the installer and follow the defaults. After installation you should have the `node` and `npm` commands available.
 2. **Download the project**
    - Either clone this repository or download it as a ZIP and extract it.
-3. **Install the app files**
-   - Open a terminal or command prompt inside the project folder.
-   - Run:
+3. **Install and launch**
+   - Double-click `launch.sh` (macOS/Linux) or `launch.bat` (Windows),
+     or run the command below inside the project folder:
      ```bash
-     npm install
+     npm run launch
      ```
-     This fetches the Electron runtime. Once done the app works without internet access.
-4. **Start the explorer**
-   ```bash
-  npm start
-  ```
-  If an error mentions running as root without a sandbox, use:
-  ```bash
-  npm start -- --no-sandbox
-  ```
+     The script installs dependencies (only the first time) and then opens the explorer.
+   - If an error mentions running as root without a sandbox, use:
+     ```bash
+     npm start -- --no-sandbox
+     ```
 
 This command requires an available display server (such as X11 or Wayland).
 Without a graphical environment Electron cannot launch.
