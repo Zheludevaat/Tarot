@@ -10,8 +10,9 @@ This project packages the **Holographic Tarot Explorer** as a small desktop appl
 2. **Download the project**
    - Either clone this repository or download it as a ZIP and extract it.
 3. **Install and launch**
-   - Double-click `launch.sh` (macOS/Linux) or `launch.bat` (Windows),
-     or run the command below inside the project folder:
+   - On macOS/Linux you can double-click `launch.sh`.
+   - On Windows double-click `launch.bat`. If the window closes too quickly, open a **Command Prompt** in this folder and run `launch.bat` so any messages remain visible.
+   - Alternatively run the command below inside the project folder:
      ```bash
      npm run launch
      ```
