@@ -28,3 +28,4 @@ npm start -- --no-sandbox
 The explorer opens a window rendering `index.html` with the interactive tarot
 visualization completely offline.
 
+
