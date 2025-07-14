@@ -2,30 +2,30 @@
 
 This project packages the **Holographic Tarot Explorer** as a small desktop application using [Electron](https://www.electronjs.org/).
 
-## Quick Setup
+# Installation
 
-1. **Install Node.js**
-   - Go to [nodejs.org](https://nodejs.org/) and download the "LTS" installer for your operating system.
-   - Run the installer and follow the defaults. After installation you should have the `node` and `npm` commands available.
-2. **Download the project**
-   - Either clone this repository or download it as a ZIP and extract it.
-3. **Install the app files**
-   - Open a terminal or command prompt inside the project folder.
-   - Run:
-     ```bash
-     npm install
-     ```
-     This fetches the Electron runtime. Once done the app works without internet access.
-4. **Start the explorer**
+1. Ensure you have [Node.js](https://nodejs.org/) installed (version 16 or later).
+   The app uses `npm` to fetch the Electron runtime and does not require an
+   internet connection after the dependencies are installed.
+2. Install the dependencies:
    ```bash
-  npm start
-  ```
-  If an error mentions running as root without a sandbox, use:
-  ```bash
-  npm start -- --no-sandbox
-  ```
-   A graphical desktop environment (Windows, macOS or a Linux desktop session) is required. Headless servers will not display the window.
+   npm start
+   ```
 
-A window will open displaying `index.html` with the interactive tarot visualization.
+## Running
 
-If you need help with any of the steps above, let us know which operating system you're using so we can provide more specific instructions.
+Start the Electron application with:
+```bash
+npm start
+```
+
+If you are running in a container or as the `root` user you may need to disable
+the Chromium sandbox:
+```bash
+npm start -- --no-sandbox
+```
+
+The explorer opens a window rendering `index.html` with the interactive tarot
+visualization completely offline.
+
+

@@ -1,11 +1,17 @@
 // Holographic Tarot Explorer Logic (offline)
 // Data and graph logic with additional connection types
 
+const GEMATRIA_VALUES = { "Aleph": 1, "Beth": 2, "Gimel": 3, "Daleth": 4, "Heh": 5, "Vau": 6, "Zain": 7, "Cheth": 8, "Teth": 9, "Yod": 10, "Kaph": 20, "Lamed": 30, "Mem": 40, "Nun": 50, "Samekh": 60, "Ayin": 70, "Peh": 80, "Tzaddi": 90, "Koph": 100, "Resh": 200, "Shin": 300, "Tau": 400 };
 const ASTROLOGICAL_OPPOSITES = { "Aries": "Libra", "Libra": "Aries", "Taurus": "Scorpio", "Scorpio": "Taurus", "Gemini": "Sagittarius", "Sagittarius": "Gemini", "Cancer": "Capricorn", "Capricorn": "Cancer", "Leo": "Aquarius", "Aquarius": "Leo", "Virgo": "Pisces", "Pisces": "Virgo" };
 const KABBALISTIC_COMPLEMENTARY_SEPHIROTH = [ new Set(["Kether", "Malkuth"]), new Set(["Chokmah", "Binah"]), new Set(["Chesed", "Geburah"]), new Set(["Netzach", "Hod"]) ];
+const UNIVERSAL_ARCHETYPAL_PRINCIPLES = [ "Initiation", "Will", "Intuition", "Nurturing", "Structure", "Guidance", "Choice", "Control", "Courage", "Introspection", "Cycles", "Balance", "Perspective", "Transformation", "Harmony", "Shadow", "Revelation", "Hope", "Subconscious", "Clarity", "Awakening", "Completion", "Chaos", "Order", "Freedom", "Constraint", "Growth", "Decay", "Light", "Darkness", "Emanation", "Containment", "DivineFlow", "Manifestation", "Concealment" ];
+
 
 // majorArcanaData is large: inserted below
 const majorArcanaData = [
+{"name": "The Fool", "card_number": 0, "color": "#FBBF24", "core_theme": {"positive": "Innocent Potential", "neutral": "Uncharted Journey", "negative": "Reckless Folly"}, "archetypal_principles": {"Initiation": 1, "Will": 0, "Intuition": 0, "Nurturing": 0, "Structure": -1, "Guidance": 0, "Choice": 1, "Control": -1, "Courage": 1, "Introspection": 0, "Cycles": 0, "Balance": 0, "Perspective": 1, "Transformation": 0, "Harmony": 0, "Shadow": -1, "Revelation": 0, "Hope": 1, "Subconscious": 1, "Clarity": 0, "Awakening": 0, "Completion": -1, "Chaos": 1, "Order": -1, "Freedom": 1, "Constraint": -1, "Growth": 1, "Decay": 0, "Light": 1, "Darkness": 0, "Emanation": 1, "Containment": -1, "DivineFlow": 1, "Manifestation": 0, "Concealment": 0}, "fractal_signatures_embedded": ["The Magician", "The World", "Death", "The Star"], "unique_symbols": ["cliff", "white rose", "dog", "sun", "backpack", "butterfly"], "primary_geometry_type": "Mobius", "primary_fractal_pattern": "WaterRipples", "hebrew_letter": "Aleph", "gematria_value": 1, "kabbalistic_path_number": 11, "astrological_correspondence": "Element: Air", "astrological_modality": null, "path_from_sephirah": "Kether", "path_to_sephirah": "Chokmah"},
+{"name": "The Magician", "card_number": 1, "color": "#FDE047", "core_theme": {"positive": "Creative Will", "neutral": "Manifestation", "negative": "Manipulation"}, "archetypal_principles": {"Initiation": 1, "Will": 1, "Intuition": 0, "Nurturing": 0, "Structure": 1, "Guidance": 1, "Choice": 0, "Control": 1, "Courage": 0, "Introspection": 0, "Cycles": 0, "Balance": 1, "Perspective": 0, "Transformation": 1, "Harmony": 0, "Shadow": -1, "Revelation": 0, "Hope": 0, "Subconscious": 0, "Clarity": 1, "Awakening": 1, "Completion": 0, "Chaos": 0, "Order": 1, "Freedom": 0, "Constraint": 0, "Growth": 1, "Decay": 0, "Light": 1, "Darkness": 0, "Emanation": 1, "Containment": 0, "DivineFlow": 1, "Manifestation": 1, "Concealment": 0}, "fractal_signatures_embedded": ["The Fool", "The High Priestess", "The Devil", "The Sun"], "unique_symbols": ["wand", "table", "elements (air, fire, water, earth)", "lemniscate", "serpent"], "primary_geometry_type": "Tetrahedron", "primary_fractal_pattern": "CrystalLattice", "hebrew_letter": "Beth", "gematria_value": 2, "kabbalistic_path_number": 12, "astrological_correspondence": "Planet: Mercury", "astrological_modality": null, "path_from_sephirah": "Kether", "path_to_sephirah": "Binah"},
+[
 {"name": "The Fool", "card_number": 0, "color": "#FBBF24", "core_theme": {"positive": "Innocent Potential", "neutral": "Uncharted Journey", "negative": "Reckless Folly"}, "archetypal_principles": {"Initiation": 1, "Will": 0, "Intuition": 0, "Nurturing": 0, "Structure": -1, "Guidance": 0, "Choice": 1, "Control": -1, "Courage": 1, "Introspection": 0, "Cycles": 0, "Balance": 0, "Perspective": 1, "Transformation": 0, "Harmony": 0, "Shadow": -1, "Revelation": 0, "Hope": 1, "Subconscious": 1, "Clarity": 0, "Awakening": 0, "Completion": -1, "Chaos": 1, "Order": -1, "Freedom": 1, "Constraint": -1, "Growth": 1, "Decay": 0, "Light": 1, "Darkness": 0, "Emanation": 1, "Containment": -1, "DivineFlow": 1, "Manifestation": 0, "Concealment": 0}, "fractal_signatures_embedded": ["The Magician", "The World", "Death", "The Star"], "unique_symbols": ["cliff", "white rose", "dog", "sun", "backpack", "butterfly"], "primary_geometry_type": "Mobius", "primary_fractal_pattern": "WaterRipples", "hebrew_letter": "Aleph", "gematria_value": 1, "kabbalistic_path_number": 11, "astrological_correspondence": "Element: Air", "astrological_modality": null, "path_from_sephirah": "Kether", "path_to_sephirah": "Chokmah"},
 {"name": "The Magician", "card_number": 1, "color": "#FDE047", "core_theme": {"positive": "Creative Will", "neutral": "Manifestation", "negative": "Manipulation"}, "archetypal_principles": {"Initiation": 1, "Will": 1, "Intuition": 0, "Nurturing": 0, "Structure": 1, "Guidance": 1, "Choice": 0, "Control": 1, "Courage": 0, "Introspection": 0, "Cycles": 0, "Balance": 1, "Perspective": 0, "Transformation": 1, "Harmony": 0, "Shadow": -1, "Revelation": 0, "Hope": 0, "Subconscious": 0, "Clarity": 1, "Awakening": 1, "Completion": 0, "Chaos": 0, "Order": 1, "Freedom": 0, "Constraint": 0, "Growth": 1, "Decay": 0, "Light": 1, "Darkness": 0, "Emanation": 1, "Containment": 0, "DivineFlow": 1, "Manifestation": 1, "Concealment": 0}, "fractal_signatures_embedded": ["The Fool", "The High Priestess", "The Devil", "The Sun"], "unique_symbols": ["wand", "table", "elements (air, fire, water, earth)", "lemniscate", "serpent"], "primary_geometry_type": "Tetrahedron", "primary_fractal_pattern": "CrystalLattice", "hebrew_letter": "Beth", "gematria_value": 2, "kabbalistic_path_number": 12, "astrological_correspondence": "Planet: Mercury", "astrological_modality": null, "path_from_sephirah": "Kether", "path_to_sephirah": "Binah"},
 {"name": "The High Priestess", "card_number": 2, "color": "#60A5FA", "core_theme": {"positive": "Sacred Intuition", "neutral": "Hidden Wisdom", "negative": "Unveiled Secrets"}, "archetypal_principles": {"Initiation": 0, "Will": -1, "Intuition": 1, "Nurturing": 0, "Structure": 0, "Guidance": 1, "Choice": 0, "Control": 0, "Courage": 0, "Introspection": 1, "Cycles": 0, "Balance": 0, "Perspective": 1, "Transformation": 0, "Harmony": 0, "Shadow": 0, "Revelation": 0, "Hope": 0, "Subconscious": 1, "Clarity": 0, "Awakening": 0, "Completion": 0, "Chaos": 0, "Order": 0, "Freedom": 0, "Constraint": 0, "Growth": 0, "Decay": 0, "Light": 0, "Darkness": 1, "Emanation": 0, "Containment": 1, "DivineFlow": 0, "Manifestation": 0, "Concealment": 1}, "fractal_signatures_embedded": ["The Moon", "The Star", "The Magician", "The Hermit"], "unique_symbols": ["veil", "pillars (B & J)", "scroll", "pomegranate", "crescent moon", "water"], "primary_geometry_type": "Sphere", "primary_fractal_pattern": "CosmicWeb", "hebrew_letter": "Gimel", "gematria_value": 3, "kabbalistic_path_number": 13, "astrological_correspondence": "Planet: Moon", "astrological_modality": null, "path_from_sephirah": "Kether", "path_to_sephirah": "Tiphareth"},
@@ -30,6 +36,7 @@ const majorArcanaData = [
 {"name": "The World", "card_number": 21, "color": "#10B981", "core_theme": {"positive": "Wholeness & Completion", "neutral": "Integration & Fulfillment", "negative": "Stagnation & Entrapment"}, "archetypal_principles": {"Initiation": 0, "Will": 0, "Intuition": 0, "Nurturing": 1, "Structure": 1, "Guidance": 0, "Choice": 0, "Control": 0, "Courage": 0, "Introspection": 0, "Cycles": 1, "Balance": 1, "Perspective": 1, "Transformation": 1, "Harmony": 1, "Shadow": -1, "Revelation": 0, "Hope": 1, "Subconscious": 0, "Clarity": 1, "Awakening": 1, "Completion": 1, "Chaos": 0, "Order": 1, "Freedom": 1, "Constraint": 0, "Growth": 1, "Decay": 0, "Light": 1, "Darkness": 0, "Emanation": 1, "Containment": 1, "DivineFlow": 1, "Manifestation": 1, "Concealment": 0}, "fractal_signatures_embedded": ["The Fool", "Judgement", "The Empress", "Temperance"], "unique_symbols": ["wreath", "dancer", "four creatures (Evangelists)", "ribbons", "wand", "globe"], "primary_geometry_type": "Ellipse", "primary_fractal_pattern": "CosmicEgg", "hebrew_letter": "Tau", "gematria_value": 400, "kabbalistic_path_number": 32, "astrological_correspondence": "Planet: Saturn", "astrological_modality": null, "path_from_sephirah": "Yesod", "path_to_sephirah": "Malkuth"}
 ];
 
+];
 
 function getCardByName(name) {
   return majorArcanaData.find(c => c.name === name) || null;
@@ -52,10 +59,8 @@ function buildGraphData() {
       if (c1Zodiac in ASTROLOGICAL_OPPOSITES && ASTROLOGICAL_OPPOSITES[c1Zodiac] === c2Zodiac) types.add("Astrological Opposition");
       // complementary sephiroth
       KABBALISTIC_COMPLEMENTARY_SEPHIROTH.forEach(pair => {
-        if ((pair.has(card1.path_from_sephirah) && pair.has(card2.path_to_sephirah)) ||
-            (pair.has(card1.path_to_sephirah) && pair.has(card2.path_from_sephirah))) {
-          types.add("Complementary Sephiroth");
-        }
+=======
+        if (pair.has(card1.path_from_sephirah) && pair.has(card2.path_to_sephirah)) types.add("Complementary Sephiroth");
       });
       // gematria resonance
       if (Math.abs(card1.gematria_value - card2.gematria_value) <= 5) types.add("Gematria Resonance");
@@ -165,12 +170,10 @@ const resetBtn = d3.select('#reset-btn');
 let selectionHistory = [];
 
 const simulation = d3.forceSimulation(nodes)
-  .force('link', d3.forceLink(links)
-    .id(d => d.id)
-    .strength(d => 0.02 * d.weight)
-    .distance(d => 260 - d.weight * 20))
+
+  .force('link', d3.forceLink(links).id(d=>d.id).strength(0.05).distance(200))
   .force('charge', d3.forceManyBody().strength(-250))
-  .force('center', d3.forceCenter(width / 2, height / 2));
+  .force('center', d3.forceCenter(width/2, height/2));
 
 const linkGroup = svg.append('g').attr('class','links');
 const nodeGroup = svg.append('g').attr('class','nodes');
@@ -242,9 +245,7 @@ function updateFocusState() {
     narrativeHub.classed('show', false);
     nodeSelection.attr('class','node').select('circle').attr('r',12);
     linkSelection.attr('class','link');
-    simulation.force('link')
-      .strength(d => 0.02 * d.weight)
-      .distance(d => 260 - d.weight * 20);
+    simulation.force('link').strength(0.05).distance(200);
     simulation.force('charge').strength(-250);
     simulation.force('center', d3.forceCenter(width/2, height/2));
   } else {
@@ -282,9 +283,8 @@ function updateFocusState() {
       return 'link';
     });
     simulation.force('center', null);
-    simulation.force('link')
-      .strength(l => (focusIds.has(l.source.id) || focusIds.has(l.target.id)) ? 0.1 * l.weight : 0.02 * l.weight)
-      .distance(l => (focusIds.has(l.source.id) || focusIds.has(l.target.id)) ? 120 : 260 - l.weight * 20);
+    simulation.force('link').strength(l => focusIds.has(l.source.id) || focusIds.has(l.target.id) ? 0.6 : 0.01)
+      .distance(l => focusIds.has(l.source.id) || focusIds.has(l.target.id) ? 120 : 300);
     simulation.force('charge').strength(d => focusIds.has(d.id) ? -1000 : -150);
   }
   simulation.alpha(1).restart();
