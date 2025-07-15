@@ -27,6 +27,8 @@
     .link.is-secondary { stroke: #6b7280; stroke-opacity: 0.6; }
     #narrative-hub { position: absolute; top: 20px; right: -500px; width: 450px; max-width: 90vw; height: calc(100vh - 40px); background: rgba(17,24,39,0.85); backdrop-filter: blur(10px); border-left: 1px solid rgba(107,114,128,0.5); border-radius: 12px 0 0 12px; transition: right 0.5s ease-in-out; display: flex; flex-direction: column; box-shadow: -10px 0 30px rgba(0,0,0,0.3); }
     #narrative-hub.show { right: 0; }
+    #close-hub { position:absolute; top:6px; right:6px; color:#9ca3af; font-size:20px; line-height:1; cursor:pointer; }
+    #close-hub:hover { color:#f87171; }
     #narrative-tabs { display: flex; flex-shrink: 0; border-bottom: 1px solid rgba(107,114,128,0.5); padding: 0 10px; }
     .narrative-tab { padding: 10px 15px; cursor: pointer; color: #9ca3af; font-size: 14px; border-bottom: 2px solid transparent; transition: all 0.2s; }
     .narrative-tab:hover { color: #e5e7eb; }
@@ -52,6 +54,7 @@
   </div>
   <div id="tooltip"></div>
   <div id="narrative-hub">
+    <button id="close-hub" aria-label="Close">&times;</button>
     <div id="narrative-tabs"></div>
     <div id="narrative-content-area"></div>
   </div>

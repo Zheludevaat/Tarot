@@ -194,7 +194,7 @@ let links = [];
 let width, height;
 let floatAngles = [];
 let svg, tooltip, narrativeHub, narrativeTabs, narrativeContentArea;
-let backBtn, resetBtn, glossaryBtn, connectionLegend;
+let backBtn, resetBtn, glossaryBtn, closeBtn, connectionLegend;
 let simulation, linkGroup, nodeGroup, linkSelection, nodeSelection;
 
 function getCardByName(name) {
@@ -451,7 +451,7 @@ function generateGlossary() {
   `;
 }
 async function init(){
-  const resp = await fetch('assets/majorArcana.json');
+  const resp = await fetch(new URL('./assets/majorArcana.json', import.meta.url));
   majorArcanaData = await resp.json();
   ({ nodes, links } = buildGraphData());
   assignAndNormalizeWeights(nodes, links);
@@ -469,6 +469,7 @@ async function init(){
   backBtn = d3.select('#back-btn');
   resetBtn = d3.select('#reset-btn');
   glossaryBtn = d3.select('#glossary-btn');
+  closeBtn = d3.select('#close-hub');
   connectionLegend = d3.select('#connection-legend');
 
 let selectionHistory = [];
@@ -550,15 +551,21 @@ backBtn.on('click', () => {
 
 resetBtn.on('click', () => { selectionHistory=[]; updateFocusAndNarrative(); });
 glossaryBtn.on('click', () => {
-  if(selectionHistory.length===0){
-    narrativeHub.classed('show', true);
-    narrativeTabs.html('<div class="narrative-tab active" data-target="pane-glossary">Glossary</div>');
-    narrativeContentArea.html('<div class="narrative-pane active" id="pane-glossary">'+generateGlossary()+'</div>');
-    attachGlossaryEvents();
+  if (selectionHistory.length === 0) {
+    if (narrativeHub.classed('show')) {
+      narrativeHub.classed('show', false);
+    } else {
+      narrativeHub.classed('show', true);
+      narrativeTabs.html('<div class="narrative-tab active" data-target="pane-glossary">Glossary</div>');
+      narrativeContentArea.html('<div class="narrative-pane active" id="pane-glossary">'+generateGlossary()+'</div>');
+      attachGlossaryEvents();
+    }
   } else {
+    narrativeHub.classed('show', true);
     d3.select("[data-target='pane-glossary']").dispatch('click');
   }
 });
+closeBtn.on('click', () => { narrativeHub.classed('show', false); });
 
 function updateFocusAndNarrative() { updateFocusState(); updateNarrative(); }
 
