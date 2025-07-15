@@ -260,19 +260,20 @@ function assignAndNormalizeWeights(nodes, links) {
   return links;
 }
 function generateSingleCardInterpretation(card) {
-  const principles = Object.entries(card.archetypal_principles)
-    .filter(([, v]) => v !== 0)
+  const values = Object.entries(card.archetypal_principles).filter(([, v]) => v !== 0);
+  const posCount = values.filter(([, v]) => v > 0).length;
+  const negCount = values.filter(([, v]) => v < 0).length;
+  const principles = values
     .map(([k, v]) => {
-      const label = v > 0 ? 'Dominant' : 'Shadow';
-      const color = v > 0 ? 'text-green-400' : 'text-red-400';
-      return `<details class="mb-1"><summary class="cursor-pointer"><strong>${k}:</strong> <span class="${color} font-medium">${label}</span></summary><div class="text-gray-400 pl-4 mt-1">${PRINCIPLE_EXPLANATIONS[k] || ''}</div></details>`;
+      const color = v > 0 ? 'bg-green-400' : 'bg-red-400';
+      return `<details class="mb-1"><summary class="cursor-pointer flex items-center"><span class="w-2 h-2 mr-2 rounded-full ${color}"></span><strong>${k}</strong></summary><div class="text-gray-400 pl-4 mt-1">${PRINCIPLE_EXPLANATIONS[k] || ''}</div></details>`;
     })
     .join('');
   return `
   <h2 class="text-2xl mb-4"><span class="font-bold title-font text-xl" style="color:${card.color};">${card.name}</span></h2>
   <p class="text-gray-300 text-sm leading-relaxed mb-4">At its heart, this card embodies the archetype of <strong>${card.core_theme.neutral}</strong>. This manifests as the potential for <strong>${card.core_theme.positive}</strong> when embraced, but can fall into the shadow of <strong>${card.core_theme.negative}</strong>.</p>
   <h3 class="font-bold title-font text-lg text-gray-100 mb-2">Key Archetypal Principles</h3>
-  <p class="text-xs text-gray-400 mb-1">Dominant principles appear in <span class="text-green-400">green</span>; shadow influences in <span class="text-red-400">red</span>.</p>
+  <p class="text-xs text-gray-400 mb-1"><span class="inline-block w-2 h-2 bg-green-400 rounded-full mr-1"></span>dominant &nbsp; <span class="inline-block w-2 h-2 bg-red-400 rounded-full mr-1"></span>shadow &nbsp; <span class="text-gray-500">(${posCount}/${negCount})</span></p>
   <div class="text-sm text-gray-300 mb-4 space-y-2">${principles}</div>
   <h3 class="font-bold title-font text-lg text-gray-100 mb-2">Symbolic Language</h3>
   <details class="mb-4"><summary class="cursor-pointer text-gray-300 text-sm leading-relaxed">The card speaks through various motifs.</summary>
@@ -305,17 +306,19 @@ function generateCombinationInterpretation(cards, allLinks) {
       combined[k] = (combined[k] || 0) + v;
     });
   });
+  const comboValues = Object.entries(combined).filter(([, v]) => v !== 0);
+  const comboPos = comboValues.filter(([, v]) => v > 0).length;
+  const comboNeg = comboValues.filter(([, v]) => v < 0).length;
   const comboPrinciples = Object.entries(combined)
     .filter(([, v]) => v !== 0)
     .map(([k, v]) => {
-      const label = v > 0 ? 'Shared Dominance' : 'Collective Shadow';
-      const color = v > 0 ? 'text-green-400' : 'text-red-400';
-      return `<details class="mb-1"><summary class="cursor-pointer"><strong>${k}:</strong> <span class="${color} font-medium">${label}</span></summary><div class="text-gray-400 pl-4 mt-1">${PRINCIPLE_EXPLANATIONS[k] || ''}</div></details>`;
+      const color = v > 0 ? 'bg-green-400' : 'bg-red-400';
+      return `<details class="mb-1"><summary class="cursor-pointer flex items-center"><span class="w-2 h-2 mr-2 rounded-full ${color}"></span><strong>${k}</strong></summary><div class="text-gray-400 pl-4 mt-1">${PRINCIPLE_EXPLANATIONS[k] || ''}</div></details>`;
     })
     .join('');
   if (comboPrinciples) {
     html += `<h3 class="font-bold title-font text-lg text-gray-100 mb-2">Combined Archetypal Currents</h3>`;
-    html += `<p class="text-xs text-gray-400 mb-1">Green indicates mutually reinforcing traits; red shows shared challenges.</p>`;
+    html += `<p class="text-xs text-gray-400 mb-1"><span class="inline-block w-2 h-2 bg-green-400 rounded-full mr-1"></span>dominant &nbsp; <span class="inline-block w-2 h-2 bg-red-400 rounded-full mr-1"></span>shadow &nbsp; <span class="text-gray-500">(${comboPos}/${comboNeg})</span></p>`;
     html += `<div class="text-sm text-gray-300 mb-4 space-y-2">${comboPrinciples}</div>`;
   }
   html += `<h3 class="font-bold title-font text-lg text-gray-100 mb-2">Points of Interaction</h3>`;
@@ -353,6 +356,8 @@ function generateCombinationInterpretation(cards, allLinks) {
           }
           if (summary) {
             const explain = CONNECTION_EXPLANATIONS[type] || '';
+            const weightDesc = getWeightDescription(link.weight);
+            summary = `<strong>${weightDesc}</strong> - ${summary}`;
             html += `<li class="p-3 bg-gray-900/50 rounded-md border-l-2 border-purple-400"><details><summary class="cursor-pointer">${summary}</summary><div class="text-gray-400 mt-1 pl-2">${explain}</div></details></li>`;
           }
         });
