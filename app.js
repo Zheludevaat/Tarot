@@ -6,11 +6,179 @@ const ASTROLOGICAL_OPPOSITES = { "Aries": "Libra", "Libra": "Aries", "Taurus": "
 const KABBALISTIC_COMPLEMENTARY_SEPHIROTH = [ new Set(["Kether", "Malkuth"]), new Set(["Chokmah", "Binah"]), new Set(["Chesed", "Geburah"]), new Set(["Netzach", "Hod"]) ];
 const UNIVERSAL_ARCHETYPAL_PRINCIPLES = [ "Initiation", "Will", "Intuition", "Nurturing", "Structure", "Guidance", "Choice", "Control", "Courage", "Introspection", "Cycles", "Balance", "Perspective", "Transformation", "Harmony", "Shadow", "Revelation", "Hope", "Subconscious", "Clarity", "Awakening", "Completion", "Chaos", "Order", "Freedom", "Constraint", "Growth", "Decay", "Light", "Darkness", "Emanation", "Containment", "DivineFlow", "Manifestation", "Concealment" ];
 
-// majorArcanaData is large: inserted below
+const PRINCIPLE_EXPLANATIONS = {
+  Initiation: "The spark that launches a new journey.",
+  Will: "The drive that shapes reality through intention.",
+  Intuition: "Understanding that emerges beyond rational thought.",
+  Nurturing: "Compassionate support that fosters growth.",
+  Structure: "Order and form that create stability.",
+  Guidance: "A source of direction lighting the path forward.",
+  Choice: "Decision points that define one's path.",
+  Control: "The ability to influence or restrain forces.",
+  Courage: "Bravery in the face of uncertainty.",
+  Introspection: "Turning inward to gain self-knowledge.",
+  Cycles: "Recurring phases that shape experience.",
+  Balance: "Dynamic equilibrium among forces.",
+  Perspective: "The vantage point from which events are interpreted.",
+  Transformation: "Profound change from one state to another.",
+  Harmony: "Alignment that creates synergy.",
+  Shadow: "Hidden aspects revealing unresolved issues.",
+  Revelation: "Sudden clarity unveiling deeper truth.",
+  Hope: "Expectation that guides toward better outcomes.",
+  Subconscious: "Hidden influences beneath conscious awareness.",
+  Clarity: "Seeing circumstances without distortion.",
+  Awakening: "Realization that opens new awareness.",
+  Completion: "The fulfillment of a cycle or goal.",
+  Chaos: "Disruptive energy that sparks renewal.",
+  Order: "Structured arrangement fostering predictability.",
+  Freedom: "Ability to act without restraint.",
+  Constraint: "Limitations that shape possibilities.",
+  Growth: "Expansion and development over time.",
+  Decay: "Breaking down to make room for renewal.",
+  Light: "Illumination and conscious awareness.",
+  Darkness: "The unknown aspects that challenge perception.",
+  Emanation: "Outward flow from a central source.",
+  Containment: "Boundaries that restrict or hold energy in place.",
+  DivineFlow: "Effortless movement guided by higher forces.",
+  Manifestation: "Bringing ideas into tangible form.",
+  Concealment: "The deliberate hiding of truths or intentions."
+};
+
+const CONNECTION_EXPLANATIONS = {
+  "Fractal Embedding":
+    "One card's patterns appear inside the other, mirroring its essence in fractal form.",
+  "Symbol Echo":
+    "Shared iconography resonates between the cards, reinforcing their themes.",
+  "Shared Geometry":
+    "Identical geometric forms create structural harmony across the cards.",
+  "Shared Astrology":
+    "A common celestial influence guides both cards' energies.",
+  "Astrological Opposition":
+    "Opposing zodiac signs create tension that sparks dynamic growth.",
+  "Complementary Sephiroth":
+    "Kabbalistic paths complement each other, suggesting spiritual reciprocity.",
+  "Gematria Resonance":
+    "Numerical values align closely, hinting at occult synchronicity."
+};
+
+function glossaryLink(term) {
+  return `<a href="#glossary-${term.replace(/\s+/g,'-')}" class="underline glossary-link">${term}</a>`;
+}
+
+const GEOMETRY_EXPLANATIONS = {
+  Circle: "Wholeness and eternal cycles.",
+  Cone: "Focus rising toward a point of power.",
+  Crescent: "Partial illumination and growth.",
+  Cross: "Intersection of paths and balance.",
+  Cube: "Grounded structure and stability.",
+  Cylinder: "Ongoing motion along a set course.",
+  Ellipse: "Orbiting cycles and return.",
+  InvertedTriangle: "Descent of spirit into matter.",
+  Mobius: "A single surface twisting into infinity.",
+  Octagram: "Eightfold harmony and regeneration.",
+  Octahedron: "Balance between above and below.",
+  Pentagram: "Integration of the five elements.",
+  Pyramid: "Ascension through layered effort.",
+  RadiantCircle: "Expanding illumination and joy.",
+  Scythe: "Cutting away the outworn.",
+  ShatteredCube: "Breaking rigid constraints.",
+  Sphere: "Unity and limitless potential.",
+  Spiral: "Evolution unfolding in cycles.",
+  Square: "Foundation and reliability.",
+  Tetrahedron: "Dynamic action and change.",
+  Triangle: "Focused intent and aspiration.",
+  Vessel: "Container for transformation."
+};
+
+const FRACTAL_PATTERN_EXPLANATIONS = {
+  AncientRunes: "Marks of forgotten wisdom repeating through time.",
+  BoneBlossom: "Life emerging from endings.",
+  ClockworkGears: "Interlocking cycles of precision.",
+  CosmicEgg: "Potential of creation coiled within.",
+  CosmicWeb: "Threads that bind the universe together.",
+  CrackedEarth: "Shifting foundations and upheaval.",
+  CrystalLattice: "Structured growth and clarity.",
+  DecayingLeaves: "Natural release and renewal.",
+  DesertSands: "Windswept change and adaptation.",
+  DreamMist: "Ephemeral visions swirling softly.",
+  FloralBloom: "Beauty unfolding in delicate patterns.",
+  FlowingWater: "Emotion and intuition in motion.",
+  InfernalFlames: "Purifying intensity and passion.",
+  IntertwinedVines: "Relationships growing together.",
+  MountainRange: "Steadfast endurance rising high.",
+  Nebula: "Stellar birth within swirling clouds.",
+  RootSystem: "Hidden support and connection.",
+  SoundWaves: "Vibrations carrying messages.",
+  SunflowerPattern: "Radiant growth that follows the light.",
+  SwirlingClouds: "Restless thoughts and change.",
+  TiledPavement: "Ordered paths that intersect.",
+  WaterRipples: "Expanding effects from a single action."
+};
+
+const ASTROLOGY_EXPLANATIONS = {
+  "Element: Air": "Thought, communication and intellect.",
+  "Element: Fire": "Passion, energy and transformation.",
+  "Element: Water": "Emotion, intuition and flow.",
+  "Planet: Jupiter": "Expansion, luck and philosophy.",
+  "Planet: Mars": "Drive, conflict and assertion.",
+  "Planet: Mercury": "Mind, messages and agility.",
+  "Planet: Moon": "Cycles, instincts and memory.",
+  "Planet: Saturn": "Structure, discipline and limits.",
+  "Planet: Sun": "Vitality, clarity and purpose.",
+  "Planet: Venus": "Harmony, attraction and pleasure.",
+  "Zodiac: Aquarius": "Innovation, detachment and vision.",
+  "Zodiac: Aries": "Initiation, courage and impulse.",
+  "Zodiac: Cancer": "Nurturing, protection and feeling.",
+  "Zodiac: Capricorn": "Ambition, mastery and endurance.",
+  "Zodiac: Gemini": "Curiosity, duality and exchange.",
+  "Zodiac: Leo": "Radiance, pride and creativity.",
+  "Zodiac: Libra": "Balance, partnership and fairness.",
+  "Zodiac: Pisces": "Dreams, empathy and dissolution.",
+  "Zodiac: Sagittarius": "Exploration, optimism and truth.",
+  "Zodiac: Scorpio": "Intensity, secrets and transformation.",
+  "Zodiac: Taurus": "Stability, pleasure and persistence.",
+  "Zodiac: Virgo": "Refinement, service and analysis."
+};
+
+const SEPHIRAH_EXPLANATIONS = {
+  Kether: "Crown of pure potential.",
+  Chokmah: "Wisdom and generative spark.",
+  Binah: "Understanding and structure.",
+  Chesed: "Mercy and expansive love.",
+  Geburah: "Strength and disciplined power.",
+  Tiphareth: "Beauty balancing the divine and human.",
+  Netzach: "Victory through endurance and desire.",
+  Hod: "Splendor of intellect and communication.",
+  Yesod: "Foundation linking form and force.",
+  Malkuth: "Kingdom manifest in the physical world."
+};
+
+const HEBREW_LETTER_EXPLANATIONS = {
+  Aleph: "The breath of beginnings (1).",
+  Beth: "A house or container (2).",
+  Gimel: "A camel, the journey (3).",
+  Daleth: "A door of opportunity (4).",
+  Heh: "Window of revelation (5).",
+  Vau: "Nail or hook that joins (6).",
+  Zain: "Sword of discernment (7).",
+  Cheth: "Fence of protection (8).",
+  Teth: "Serpent power within (9).",
+  Yod: "The divine spark (10).",
+  Kaph: "Palm receptive to gifts (20).",
+  Lamed: "Staff guiding learning (30).",
+  Mem: "Waters of depth (40).",
+  Nun: "Fish of life and movement (50).",
+  Samekh: "Prop or support (60).",
+  Ayin: "Eye that perceives (70).",
+  Peh: "Mouth expressing command (80).",
+  Tzaddi: "Hook drawing forth righteousness (90).",
+  Koph: "Back of the head, subconscious (100).",
+  Resh: "Head of authority (200).",
+  Shin: "Tooth of transforming fire (300).",
+  Tau: "Mark of completion (400)."
+};
+
 const majorArcanaData = [
-{"name": "The Fool", "card_number": 0, "color": "#FBBF24", "core_theme": {"positive": "Innocent Potential", "neutral": "Uncharted Journey", "negative": "Reckless Folly"}, "archetypal_principles": {"Initiation": 1, "Will": 0, "Intuition": 0, "Nurturing": 0, "Structure": -1, "Guidance": 0, "Choice": 1, "Control": -1, "Courage": 1, "Introspection": 0, "Cycles": 0, "Balance": 0, "Perspective": 1, "Transformation": 0, "Harmony": 0, "Shadow": -1, "Revelation": 0, "Hope": 1, "Subconscious": 1, "Clarity": 0, "Awakening": 0, "Completion": -1, "Chaos": 1, "Order": -1, "Freedom": 1, "Constraint": -1, "Growth": 1, "Decay": 0, "Light": 1, "Darkness": 0, "Emanation": 1, "Containment": -1, "DivineFlow": 1, "Manifestation": 0, "Concealment": 0}, "fractal_signatures_embedded": ["The Magician", "The World", "Death", "The Star"], "unique_symbols": ["cliff", "white rose", "dog", "sun", "backpack", "butterfly"], "primary_geometry_type": "Mobius", "primary_fractal_pattern": "WaterRipples", "hebrew_letter": "Aleph", "gematria_value": 1, "kabbalistic_path_number": 11, "astrological_correspondence": "Element: Air", "astrological_modality": null, "path_from_sephirah": "Kether", "path_to_sephirah": "Chokmah"},
-{"name": "The Magician", "card_number": 1, "color": "#FDE047", "core_theme": {"positive": "Creative Will", "neutral": "Manifestation", "negative": "Manipulation"}, "archetypal_principles": {"Initiation": 1, "Will": 1, "Intuition": 0, "Nurturing": 0, "Structure": 1, "Guidance": 1, "Choice": 0, "Control": 1, "Courage": 0, "Introspection": 0, "Cycles": 0, "Balance": 1, "Perspective": 0, "Transformation": 1, "Harmony": 0, "Shadow": -1, "Revelation": 0, "Hope": 0, "Subconscious": 0, "Clarity": 1, "Awakening": 1, "Completion": 0, "Chaos": 0, "Order": 1, "Freedom": 0, "Constraint": 0, "Growth": 1, "Decay": 0, "Light": 1, "Darkness": 0, "Emanation": 1, "Containment": 0, "DivineFlow": 1, "Manifestation": 1, "Concealment": 0}, "fractal_signatures_embedded": ["The Fool", "The High Priestess", "The Devil", "The Sun"], "unique_symbols": ["wand", "table", "elements (air, fire, water, earth)", "lemniscate", "serpent"], "primary_geometry_type": "Tetrahedron", "primary_fractal_pattern": "CrystalLattice", "hebrew_letter": "Beth", "gematria_value": 2, "kabbalistic_path_number": 12, "astrological_correspondence": "Planet: Mercury", "astrological_modality": null, "path_from_sephirah": "Kether", "path_to_sephirah": "Binah"},
-[
 {"name": "The Fool", "card_number": 0, "color": "#FBBF24", "core_theme": {"positive": "Innocent Potential", "neutral": "Uncharted Journey", "negative": "Reckless Folly"}, "archetypal_principles": {"Initiation": 1, "Will": 0, "Intuition": 0, "Nurturing": 0, "Structure": -1, "Guidance": 0, "Choice": 1, "Control": -1, "Courage": 1, "Introspection": 0, "Cycles": 0, "Balance": 0, "Perspective": 1, "Transformation": 0, "Harmony": 0, "Shadow": -1, "Revelation": 0, "Hope": 1, "Subconscious": 1, "Clarity": 0, "Awakening": 0, "Completion": -1, "Chaos": 1, "Order": -1, "Freedom": 1, "Constraint": -1, "Growth": 1, "Decay": 0, "Light": 1, "Darkness": 0, "Emanation": 1, "Containment": -1, "DivineFlow": 1, "Manifestation": 0, "Concealment": 0}, "fractal_signatures_embedded": ["The Magician", "The World", "Death", "The Star"], "unique_symbols": ["cliff", "white rose", "dog", "sun", "backpack", "butterfly"], "primary_geometry_type": "Mobius", "primary_fractal_pattern": "WaterRipples", "hebrew_letter": "Aleph", "gematria_value": 1, "kabbalistic_path_number": 11, "astrological_correspondence": "Element: Air", "astrological_modality": null, "path_from_sephirah": "Kether", "path_to_sephirah": "Chokmah"},
 {"name": "The Magician", "card_number": 1, "color": "#FDE047", "core_theme": {"positive": "Creative Will", "neutral": "Manifestation", "negative": "Manipulation"}, "archetypal_principles": {"Initiation": 1, "Will": 1, "Intuition": 0, "Nurturing": 0, "Structure": 1, "Guidance": 1, "Choice": 0, "Control": 1, "Courage": 0, "Introspection": 0, "Cycles": 0, "Balance": 1, "Perspective": 0, "Transformation": 1, "Harmony": 0, "Shadow": -1, "Revelation": 0, "Hope": 0, "Subconscious": 0, "Clarity": 1, "Awakening": 1, "Completion": 0, "Chaos": 0, "Order": 1, "Freedom": 0, "Constraint": 0, "Growth": 1, "Decay": 0, "Light": 1, "Darkness": 0, "Emanation": 1, "Containment": 0, "DivineFlow": 1, "Manifestation": 1, "Concealment": 0}, "fractal_signatures_embedded": ["The Fool", "The High Priestess", "The Devil", "The Sun"], "unique_symbols": ["wand", "table", "elements (air, fire, water, earth)", "lemniscate", "serpent"], "primary_geometry_type": "Tetrahedron", "primary_fractal_pattern": "CrystalLattice", "hebrew_letter": "Beth", "gematria_value": 2, "kabbalistic_path_number": 12, "astrological_correspondence": "Planet: Mercury", "astrological_modality": null, "path_from_sephirah": "Kether", "path_to_sephirah": "Binah"},
 {"name": "The High Priestess", "card_number": 2, "color": "#60A5FA", "core_theme": {"positive": "Sacred Intuition", "neutral": "Hidden Wisdom", "negative": "Unveiled Secrets"}, "archetypal_principles": {"Initiation": 0, "Will": -1, "Intuition": 1, "Nurturing": 0, "Structure": 0, "Guidance": 1, "Choice": 0, "Control": 0, "Courage": 0, "Introspection": 1, "Cycles": 0, "Balance": 0, "Perspective": 1, "Transformation": 0, "Harmony": 0, "Shadow": 0, "Revelation": 0, "Hope": 0, "Subconscious": 1, "Clarity": 0, "Awakening": 0, "Completion": 0, "Chaos": 0, "Order": 0, "Freedom": 0, "Constraint": 0, "Growth": 0, "Decay": 0, "Light": 0, "Darkness": 1, "Emanation": 0, "Containment": 1, "DivineFlow": 0, "Manifestation": 0, "Concealment": 1}, "fractal_signatures_embedded": ["The Moon", "The Star", "The Magician", "The Hermit"], "unique_symbols": ["veil", "pillars (B & J)", "scroll", "pomegranate", "crescent moon", "water"], "primary_geometry_type": "Sphere", "primary_fractal_pattern": "CosmicWeb", "hebrew_letter": "Gimel", "gematria_value": 3, "kabbalistic_path_number": 13, "astrological_correspondence": "Planet: Moon", "astrological_modality": null, "path_from_sephirah": "Kether", "path_to_sephirah": "Tiphareth"},
@@ -33,8 +201,6 @@ const majorArcanaData = [
 {"name": "The Sun", "card_number": 19, "color": "#F97316", "core_theme": {"positive": "Radiant Joy", "neutral": "Absolute Clarity", "negative": "Delusion & Overexposure"}, "archetypal_principles": {"Initiation": 0, "Will": 0, "Intuition": 0, "Nurturing": 1, "Structure": 0, "Guidance": 0, "Choice": 0, "Control": 0, "Courage": 0, "Introspection": 0, "Cycles": 0, "Balance": 0, "Perspective": 0, "Transformation": 0, "Harmony": 1, "Shadow": -1, "Revelation": 1, "Hope": 1, "Subconscious": -1, "Clarity": 1, "Awakening": 0, "Completion": 1, "Chaos": -1, "Order": 1, "Freedom": 1, "Constraint": -1, "Growth": 1, "Decay": 0, "Light": 1, "Darkness": 0, "Emanation": 1, "Containment": 0, "DivineFlow": 1, "Manifestation": 1, "Concealment": 0}, "fractal_signatures_embedded": ["The Moon", "Judgement", "The Fool", "The Magician"], "unique_symbols": ["sun", "child", "white horse", "sunflowers", "wall", "banner"], "primary_geometry_type": "RadiantCircle", "primary_fractal_pattern": "SunflowerPattern", "hebrew_letter": "Resh", "gematria_value": 200, "kabbalistic_path_number": 30, "astrological_correspondence": "Planet: Sun", "astrological_modality": null, "path_from_sephirah": "Hod", "path_to_sephirah": "Yesod"},
 {"name": "Judgement", "card_number": 20, "color": "#F59E0B", "core_theme": {"positive": "Profound Awakening", "neutral": "Call to Reckoning", "negative": "Guilt & Self-Condemnation"}, "archetypal_principles": {"Initiation": 0, "Will": 0, "Intuition": 0, "Nurturing": 0, "Structure": 0, "Guidance": 0, "Choice": 0, "Control": 0, "Courage": 0, "Introspection": 1, "Cycles": 1, "Balance": 0, "Perspective": 0, "Transformation": 1, "Harmony": 0, "Shadow": -1, "Revelation": 1, "Hope": 0, "Subconscious": 0, "Clarity": 1, "Awakening": 1, "Completion": 0, "Chaos": 0, "Order": 1, "Freedom": 0, "Constraint": 0, "Growth": 0, "Decay": 0, "Light": 1, "Darkness": 0, "Emanation": 0, "Containment": 0, "DivineFlow": 1, "Manifestation": 1, "Concealment": 0}, "fractal_signatures_embedded": ["The Sun", "The World", "Death", "The Hermit"], "unique_symbols": ["angel", "trumpet", "coffins", "figures rising", "mountains", "clouds"], "primary_geometry_type": "Cross", "primary_fractal_pattern": "SoundWaves", "hebrew_letter": "Shin", "gematria_value": 300, "kabbalistic_path_number": 31, "astrological_correspondence": "Element: Fire", "astrological_modality": null, "path_from_sephirah": "Hod", "path_to_sephirah": "Malkuth"},
 {"name": "The World", "card_number": 21, "color": "#10B981", "core_theme": {"positive": "Wholeness & Completion", "neutral": "Integration & Fulfillment", "negative": "Stagnation & Entrapment"}, "archetypal_principles": {"Initiation": 0, "Will": 0, "Intuition": 0, "Nurturing": 1, "Structure": 1, "Guidance": 0, "Choice": 0, "Control": 0, "Courage": 0, "Introspection": 0, "Cycles": 1, "Balance": 1, "Perspective": 1, "Transformation": 1, "Harmony": 1, "Shadow": -1, "Revelation": 0, "Hope": 1, "Subconscious": 0, "Clarity": 1, "Awakening": 1, "Completion": 1, "Chaos": 0, "Order": 1, "Freedom": 1, "Constraint": 0, "Growth": 1, "Decay": 0, "Light": 1, "Darkness": 0, "Emanation": 1, "Containment": 1, "DivineFlow": 1, "Manifestation": 1, "Concealment": 0}, "fractal_signatures_embedded": ["The Fool", "Judgement", "The Empress", "Temperance"], "unique_symbols": ["wreath", "dancer", "four creatures (Evangelists)", "ribbons", "wand", "globe"], "primary_geometry_type": "Ellipse", "primary_fractal_pattern": "CosmicEgg", "hebrew_letter": "Tau", "gematria_value": 400, "kabbalistic_path_number": 32, "astrological_correspondence": "Planet: Saturn", "astrological_modality": null, "path_from_sephirah": "Yesod", "path_to_sephirah": "Malkuth"}
-];
-
 ];
 
 function getCardByName(name) {
@@ -98,18 +264,90 @@ function assignAndNormalizeWeights(nodes, links) {
   return links;
 }
 function generateSingleCardInterpretation(card) {
-  const principles = Object.entries(card.archetypal_principles)
-    .filter(([,v]) => v !== 0)
-    .map(([k,v]) => `<li><strong>${k}:</strong> ${v === 1 ? 'A dominant force' : 'A shadow influence'}</li>`)
+  const values = Object.entries(card.archetypal_principles).filter(([, v]) => v !== 0);
+  const posCount = values.filter(([, v]) => v > 0).length;
+  const negCount = values.filter(([, v]) => v < 0).length;
+  const principles = values
+    .map(([k, v]) => {
+      const color = v > 0 ? 'bg-green-400' : 'bg-red-400';
+      return `<details class="mb-1"><summary class="cursor-pointer flex items-center"><span class="w-2 h-2 mr-2 rounded-full ${color}"></span><strong>${k}</strong></summary><div class="text-gray-400 pl-4 mt-1">${PRINCIPLE_EXPLANATIONS[k] || ''}</div></details>`;
+    })
     .join('');
-  return `\n<div class="narrative-pane active" id="pane-${card.id.replace(/\s+/g,'-')}">\n  <h2 class="text-2xl mb-4"><span class="font-bold title-font text-xl" style="color:${card.color};">${card.name}</span></h2>\n  <p class="text-gray-300 text-sm leading-relaxed mb-4">At its heart, this card embodies the archetype of <strong>${card.core_theme.neutral}</strong>. This manifests as the potential for <strong>${card.core_theme.positive}</strong> when embraced, but can fall into the shadow of <strong>${card.core_theme.negative}</strong>.</p>\n  <h3 class="font-bold title-font text-lg text-gray-100 mb-2">Key Archetypal Principles</h3>\n  <ul class="list-disc list-inside text-sm text-gray-300 mb-4">${principles}</ul>\n  <h3 class="font-bold title-font text-lg text-gray-100 mb-2">Symbolic Language</h3>\n  <p class="text-gray-300 text-sm leading-relaxed mb-4">The card speaks through its unique symbols: <strong>${card.unique_symbols.join(', ')}</strong>. Its geometry of <em>${card.primary_geometry_type}</em> and fractal pattern <em>${card.primary_fractal_pattern}</em> deepen the message.</p>\n  <h3 class="font-bold title-font text-lg text-gray-100 mb-2">Esoteric Framework</h3>\n  <p class="text-gray-300 text-sm leading-relaxed">Aligned with <strong>${card.astrological_correspondence}</strong>, it follows Kabbalistic Path ${card.kabbalistic_path_number} from ${card.path_from_sephirah} to ${card.path_to_sephirah}, guided by ${card.hebrew_letter}.</p>\n</div>`;
+  return `
+  <h2 class="text-2xl mb-4"><span class="font-bold title-font text-xl" style="color:${card.color};">${card.name}</span></h2>
+  <p class="text-gray-300 text-sm leading-relaxed mb-4">At its heart, this card embodies the archetype of <strong>${card.core_theme.neutral}</strong>. This manifests as the potential for <strong>${card.core_theme.positive}</strong> when embraced, but can fall into the shadow of <strong>${card.core_theme.negative}</strong>.</p>
+  <h3 class="font-bold title-font text-lg text-gray-100 mb-2">Key Archetypal Principles</h3>
+  <p class="text-xs text-gray-400 mb-1"><span class="inline-block w-2 h-2 bg-green-400 rounded-full mr-1"></span>dominant &nbsp; <span class="inline-block w-2 h-2 bg-red-400 rounded-full mr-1"></span>shadow &nbsp; <span class="text-gray-500">(${posCount}/${negCount})</span></p>
+  <div class="text-sm text-gray-300 mb-4 space-y-2">${principles}</div>
+  <h3 class="font-bold title-font text-lg text-gray-100 mb-2">Symbolic Language</h3>
+  <details class="mb-4"><summary class="cursor-pointer text-gray-300 text-sm leading-relaxed">The card speaks through various motifs.</summary>
+    <div class="mt-2 pl-4 space-y-1 text-sm text-gray-300">
+      <p><strong>Symbols:</strong> ${card.unique_symbols.join(', ')}</p>
+      <p><strong>Geometry:</strong> <a href="#glossary-${card.primary_geometry_type}" class="underline glossary-link">${card.primary_geometry_type}</a></p>
+      <p class="text-gray-400">${GEOMETRY_EXPLANATIONS[card.primary_geometry_type] || ''}</p>
+      <p><strong>Fractal Pattern:</strong> <a href="#glossary-${card.primary_fractal_pattern}" class="underline glossary-link">${card.primary_fractal_pattern}</a></p>
+      <p class="text-gray-400">${FRACTAL_PATTERN_EXPLANATIONS[card.primary_fractal_pattern] || ''}</p>
+      <p><strong>Embedded In:</strong> ${card.fractal_signatures_embedded.join(', ')}</p>
+    </div>
+  </details>
+  <h3 class="font-bold title-font text-lg text-gray-100 mb-2">Esoteric Framework</h3>
+  <div class="text-sm text-gray-300 space-y-2">
+    <details><summary class="cursor-pointer">Astrological Influence: <a href="#glossary-${card.astrological_correspondence}" class="underline glossary-link">${card.astrological_correspondence}</a></summary><div class="pl-4 mt-1 text-gray-400">${ASTROLOGY_EXPLANATIONS[card.astrological_correspondence] || ''}</div></details>
+    <details><summary class="cursor-pointer">Kabbalistic Path ${card.kabbalistic_path_number}</summary><div class="pl-4 mt-1 text-gray-400">From <a href="#glossary-${card.path_from_sephirah}" class="underline glossary-link"><strong>${card.path_from_sephirah}</strong></a> to <a href="#glossary-${card.path_to_sephirah}" class="underline glossary-link"><strong>${card.path_to_sephirah}</strong></a><br>${SEPHIRAH_EXPLANATIONS[card.path_from_sephirah] || ''} &rarr; ${SEPHIRAH_EXPLANATIONS[card.path_to_sephirah] || ''}</div></details>
+    <details><summary class="cursor-pointer">Hebrew Letter: <a href="#glossary-${card.hebrew_letter}" class="underline glossary-link">${card.hebrew_letter} (${card.gematria_value})</a></summary><div class="pl-4 mt-1 text-gray-400">${HEBREW_LETTER_EXPLANATIONS[card.hebrew_letter] || ''}</div></details>
+  </div>
+  `;
 }
 function generateCombinationInterpretation(cards, allLinks) {
-  let html = `<div class="narrative-pane active" id="pane-constellation">`;
+  if (!cards.length) return '';
+  let html = '';
   const header = cards.map(c => `<span class="font-bold title-font text-xl" style="color:${c.color};">${c.name}</span>`).join(' & ');
   html += `<h2 class="text-2xl mb-4">${header}</h2>`;
-  const themes = cards.map(c => `<strong>${c.core_theme.neutral}</strong>`).join(' and ');
-  html += `<p class="text-gray-300 text-sm leading-relaxed mb-4">This constellation fuses the archetypes of ${themes}, weaving their narratives together.</p>`;
+
+  const root = cards[0];
+  html += `<p class="text-gray-300 text-sm leading-relaxed mb-4">The constellation grows from <strong>${root.name}</strong>, whose core theme is <strong>${root.core_theme.neutral}</strong>. Each additional card layers new meaning onto this foundation.</p>`;
+
+  const combined = { ...root.archetypal_principles };
+  let steps = '';
+  for (let i = 1; i < cards.length; i++) {
+    const card = cards[i];
+    steps += `<div class="mt-4"><h4 class="font-semibold text-gray-100">${card.name}</h4>`;
+    steps += `<p class="text-gray-300 text-sm leading-relaxed">${card.core_theme.neutral} interacts with ${root.name.toLowerCase()} to expand the narrative.</p>`;
+
+    const pairLink = allLinks.find(l => (l.source.id===root.id && l.target.id===card.id) || (l.source.id===card.id && l.target.id===root.id));
+    if (pairLink) {
+      steps += '<ul class="text-sm text-gray-300 pl-4 space-y-1">';
+      pairLink.types.forEach(type => {
+        const explain = CONNECTION_EXPLANATIONS[type] || '';
+        const weightDesc = getWeightDescription(pairLink.weight);
+        steps += `<li><strong>${weightDesc}</strong> - ${explain}</li>`;
+      });
+      steps += '</ul>';
+    }
+
+    Object.entries(card.archetypal_principles).forEach(([k,v]) => {
+      combined[k] = (combined[k] || 0) + v;
+    });
+    steps += '</div>';
+  }
+
+  html += steps;
+
+  const comboValues = Object.entries(combined).filter(([, v]) => v !== 0);
+  const comboPos = comboValues.filter(([, v]) => v > 0).length;
+  const comboNeg = comboValues.filter(([, v]) => v < 0).length;
+  const comboPrinciples = comboValues
+    .map(([k, v]) => {
+      const color = v > 0 ? 'bg-green-400' : 'bg-red-400';
+      return `<details class="mb-1"><summary class="cursor-pointer flex items-center"><span class="w-2 h-2 mr-2 rounded-full ${color}"></span><strong>${k}</strong></summary><div class="text-gray-400 pl-4 mt-1">${PRINCIPLE_EXPLANATIONS[k] || ''}</div></details>`;
+    })
+    .join('');
+  if (comboPrinciples) {
+    html += `<h3 class="font-bold title-font text-lg text-gray-100 mt-6 mb-2">Overall Archetypal Currents</h3>`;
+    html += `<p class="text-xs text-gray-400 mb-1"><span class="inline-block w-2 h-2 bg-green-400 rounded-full mr-1"></span>dominant &nbsp; <span class="inline-block w-2 h-2 bg-red-400 rounded-full mr-1"></span>shadow &nbsp; <span class="text-gray-500">(${comboPos}/${comboNeg})</span></p>`;
+    html += `<div class="text-sm text-gray-300 mb-4 space-y-2">${comboPrinciples}</div>`;
+  }
+
   html += `<h3 class="font-bold title-font text-lg text-gray-100 mb-2">Points of Interaction</h3>`;
   html += '<ul class="space-y-4 text-sm text-gray-300">';
   for (let i=0; i<cards.length; i++) {
@@ -119,37 +357,61 @@ function generateCombinationInterpretation(cards, allLinks) {
       const link = allLinks.find(l => (l.source.id===c1.id && l.target.id===c2.id) || (l.source.id===c2.id && l.target.id===c1.id));
       if (link) {
         link.types.forEach(type => {
-          let text='';
+          let summary='';
           switch(type) {
             case 'Fractal Embedding':
-              text = `A <em>Fractal Embedding</em> reveals how ${c1.name} mirrors patterns within ${c2.name}, hinting at hidden recursion in their stories.`;
+              summary = `A ${glossaryLink('Fractal Embedding')} reveals how ${c1.name} mirrors patterns within ${c2.name}.`;
               break;
             case 'Symbol Echo':
-              text = `Shared symbols echo between them, showing a common thread that reinforces their mutual significance.`;
+              summary = `${glossaryLink('Symbol Echo')} shows a mutual resonance of symbols.`;
               break;
             case 'Shared Geometry':
-              text = `Their identical geometry of <strong>${c1.primary_geometry_type}</strong> creates structural harmony.`;
+              summary = `Both share the geometry of <strong>${c1.primary_geometry_type}</strong>.`;
               break;
             case 'Shared Astrology':
-              text = `Both resonate with <strong>${c1.astrological_correspondence}</strong>, amplifying this celestial influence.`;
+              summary = `Unified under <strong>${c1.astrological_correspondence}</strong>.`;
               break;
             case 'Astrological Opposition':
-              text = `Opposing zodiac forces create dynamic balance between ${c1.name} and ${c2.name}.`;
+              summary = `${glossaryLink('Astrological Opposition')} creates balanced tension.`;
               break;
             case 'Complementary Sephiroth':
-              text = `Their sephiroth paths complement one another, suggesting spiritual reciprocity.`;
+              summary = `${glossaryLink('Complementary Sephiroth')} complete each other.`;
               break;
             case 'Gematria Resonance':
-              text = `Their gematria values nearly match, hinting at numerical synchronicity.`;
+              summary = `${glossaryLink('Gematria Resonance')} shows closely aligned values.`;
               break;
           }
-          if (text) html += `<li class="p-3 bg-gray-900/50 rounded-md border-l-2 border-purple-400">${text}</li>`;
+          if (summary) {
+            const explain = CONNECTION_EXPLANATIONS[type] || '';
+            const weightDesc = getWeightDescription(link.weight);
+            summary = `<strong>${weightDesc}</strong> - ${summary}`;
+            html += `<li class="p-3 bg-gray-900/50 rounded-md border-l-2 border-purple-400"><details><summary class="cursor-pointer">${summary}</summary><div class="text-gray-400 mt-1 pl-2">${explain}</div></details></li>`;
+          }
         });
       }
     }
   }
-  html += '</ul></div>';
+  html += '</ul>';
   return html;
+}
+
+function generateGlossary() {
+  function renderSection(title, obj) {
+    const id = 'glossary-' + title.replace(/\s+/g,'-');
+    const entries = Object.entries(obj).map(([term,def]) =>
+      `<p id="glossary-${term.replace(/\s+/g,'-')}" class="text-gray-300"><strong>${term}:</strong> ${def}</p>`).join('');
+    return `<details id="${id}" class="mb-4"><summary class="cursor-pointer font-semibold text-gray-100">${title}</summary><div class="mt-2 pl-4 space-y-1">${entries}</div></details>`;
+  }
+  return `
+    <h2 class="text-2xl mb-4">Glossary</h2>
+    ${renderSection('Archetypal Principles', PRINCIPLE_EXPLANATIONS)}
+    ${renderSection('Connection Types', CONNECTION_EXPLANATIONS)}
+    ${renderSection('Geometry', GEOMETRY_EXPLANATIONS)}
+    ${renderSection('Fractal Patterns', FRACTAL_PATTERN_EXPLANATIONS)}
+    ${renderSection('Astrology', ASTROLOGY_EXPLANATIONS)}
+    ${renderSection('Sephiroth', SEPHIRAH_EXPLANATIONS)}
+    ${renderSection('Hebrew Letters', HEBREW_LETTER_EXPLANATIONS)}
+  `;
 }
 const { nodes, links } = buildGraphData();
 assignAndNormalizeWeights(nodes, links);
@@ -302,6 +564,8 @@ function updateNarrative() {
       .attr('data-target', `pane-${card.id.replace(/\s+/g,'-')}`)
       .text(card.name);
   });
+  narrativeTabs.append('div').attr('class','narrative-tab')
+    .attr('data-target','pane-glossary').text('Glossary');
   if (selectionHistory.length>1) {
     narrativeContentArea.append('div').attr('id','pane-constellation').attr('class','narrative-pane active')
       .html(generateCombinationInterpretation(selectionHistory, links));
@@ -311,11 +575,20 @@ function updateNarrative() {
       .attr('class', `narrative-pane ${selectionHistory.length===1?'active':''}`)
       .html(generateSingleCardInterpretation(card));
   });
+  narrativeContentArea.append('div').attr('id','pane-glossary').attr('class','narrative-pane')
+    .html(generateGlossary());
   d3.selectAll('.narrative-tab').on('click', function() {
     d3.selectAll('.narrative-tab').classed('active', false);
     d3.selectAll('.narrative-pane').classed('active', false);
     d3.select(this).classed('active', true);
     d3.select('#'+this.dataset.target).classed('active', true);
+  });
+  d3.selectAll('.glossary-link').on('click', function(e){
+    e.preventDefault();
+    d3.select("[data-target='pane-glossary']").dispatch('click');
+    const id = this.getAttribute('href');
+    const el = document.querySelector(id);
+    if (el) el.scrollIntoView({behavior:'smooth'});
   });
 }
 
