@@ -206,14 +206,20 @@ function getCardByName(name) {
 }
 
 function buildGraphData() {
-  const nodes = majorArcanaData.map(card => ({ id: card.name, ...card }));
+  const idMap = new Map();
+  majorArcanaData.forEach(card => {
+    idMap.set(card.name, safeId(card.name));
+  });
+  const nodes = majorArcanaData.map(card => ({ id: idMap.get(card.name), ...card }));
   const links = [];
   for (let i = 0; i < nodes.length; i++) {
     for (let j = i + 1; j < nodes.length; j++) {
       const card1 = nodes[i];
       const card2 = nodes[j];
       let types = new Set();
-      if (card2.fractal_signatures_embedded.includes(card1.id) || card1.fractal_signatures_embedded.includes(card2.id)) types.add("Fractal Embedding");
+      const card1Embeds = card1.fractal_signatures_embedded.map(n=>idMap.get(n));
+      const card2Embeds = card2.fractal_signatures_embedded.map(n=>idMap.get(n));
+      if (card2Embeds.includes(card1.id) || card1Embeds.includes(card2.id)) types.add("Fractal Embedding");
       if (card1.unique_symbols.some(s => card2.unique_symbols.includes(s))) types.add("Symbol Echo");
       if (card1.primary_geometry_type === card2.primary_geometry_type) types.add("Shared Geometry");
       if (card1.astrological_correspondence === card2.astrological_correspondence) types.add("Shared Astrology");
@@ -313,6 +319,14 @@ function principleDelta(before, after){
   return text;
 }
 
+function lookupLink(id1, id2, all){
+  return all.find(l => {
+    const s = typeof l.source === 'object' ? l.source.id : l.source;
+    const t = typeof l.target === 'object' ? l.target.id : l.target;
+    return (s === id1 && t === id2) || (s === id2 && t === id1);
+  }) || null;
+}
+
 function generateCombinationInterpretation(cards, allLinks) {
   if (!cards.length) return '';
   let html = '';
@@ -332,7 +346,7 @@ function generateCombinationInterpretation(cards, allLinks) {
     const pairConnections = [];
     for (let j=0;j<i;j++){
       const other = cards[j];
-      const lnk = allLinks.find(l=> (l.source.id===other.id && l.target.id===card.id) || (l.source.id===card.id && l.target.id===other.id));
+      const lnk = lookupLink(other.id, card.id, allLinks);
       if(lnk){
         const desc = lnk.types.map(t=>`<span>${t}</span>`).join(', ');
         const weightDesc = getWeightDescription(lnk.weight);
@@ -373,19 +387,12 @@ function generateCombinationInterpretation(cards, allLinks) {
 
   html += `<h3 class="font-bold title-font text-lg text-gray-100 mb-2">Points of Interaction</h3>`;
   html += '<ul class="space-y-4 text-sm text-gray-300">';
-  function lookupLink(id1,id2){
-    return allLinks.find(l=>{
-      const s = typeof l.source === 'object' ? l.source.id : l.source;
-      const t = typeof l.target === 'object' ? l.target.id : l.target;
-      return (s===id1 && t===id2) || (s===id2 && t===id1);
-    });
-  }
 
   for (let i=0; i<cards.length; i++) {
     for (let j=i+1; j<cards.length; j++) {
       const c1 = cards[i];
       const c2 = cards[j];
-      const link = lookupLink(c1.id, c2.id);
+      const link = lookupLink(c1.id, c2.id, allLinks);
       if (link) {
         link.types.forEach(type => {
           let summary='';
@@ -562,6 +569,7 @@ glossaryBtn.on('click', () => {
       narrativeHub.classed('show', true);
       narrativeTabs.html('<div class="narrative-tab active" data-target="pane-glossary">Glossary</div>');
       narrativeContentArea.html('<div class="narrative-pane active" id="pane-glossary">'+generateGlossary()+'</div>');
+      bindTabEvents();
       attachGlossaryEvents();
     }
   } else {
@@ -638,7 +646,7 @@ function updateNarrative() {
   }
   selectionHistory.forEach(card => {
     narrativeTabs.append('div').attr('class', `narrative-tab ${selectionHistory.length===1?'active':''}`)
-      .attr('data-target', `pane-${safeId(card.id)}`)
+      .attr('data-target', `pane-${card.id}`)
       .text(card.name);
   });
   narrativeTabs.append('div').attr('class','narrative-tab')
@@ -648,19 +656,23 @@ function updateNarrative() {
       .html(generateCombinationInterpretation(selectionHistory, links));
   }
   selectionHistory.forEach(card => {
-    narrativeContentArea.append('div').attr('id',`pane-${safeId(card.id)}`)
+    narrativeContentArea.append('div').attr('id',`pane-${card.id}`)
       .attr('class', `narrative-pane ${selectionHistory.length===1?'active':''}`)
       .html(generateSingleCardInterpretation(card));
   });
   narrativeContentArea.append('div').attr('id','pane-glossary').attr('class','narrative-pane')
     .html(generateGlossary());
-  d3.selectAll('.narrative-tab').on('click', function() {
+  bindTabEvents();
+  attachGlossaryEvents();
+}
+
+function bindTabEvents(){
+  d3.selectAll('.narrative-tab').on('click', function(){
     d3.selectAll('.narrative-tab').classed('active', false);
     d3.selectAll('.narrative-pane').classed('active', false);
     d3.select(this).classed('active', true);
     d3.select('#'+this.dataset.target).classed('active', true);
   });
-  attachGlossaryEvents();
 }
 
 function attachGlossaryEvents() {
