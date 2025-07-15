@@ -369,11 +369,19 @@ function generateCombinationInterpretation(cards, allLinks) {
 
   html += `<h3 class="font-bold title-font text-lg text-gray-100 mb-2">Points of Interaction</h3>`;
   html += '<ul class="space-y-4 text-sm text-gray-300">';
+  function lookupLink(id1,id2){
+    return allLinks.find(l=>{
+      const s = typeof l.source === 'object' ? l.source.id : l.source;
+      const t = typeof l.target === 'object' ? l.target.id : l.target;
+      return (s===id1 && t===id2) || (s===id2 && t===id1);
+    });
+  }
+
   for (let i=0; i<cards.length; i++) {
     for (let j=i+1; j<cards.length; j++) {
       const c1 = cards[i];
       const c2 = cards[j];
-      const link = allLinks.find(l => (l.source.id===c1.id && l.target.id===c2.id) || (l.source.id===c2.id && l.target.id===c1.id));
+      const link = lookupLink(c1.id, c2.id);
       if (link) {
         link.types.forEach(type => {
           let summary='';
