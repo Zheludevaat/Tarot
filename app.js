@@ -178,6 +178,16 @@ const HEBREW_LETTER_EXPLANATIONS = {
   Tau: "Mark of completion (400)."
 };
 
+const ALL_GLOSSARY_DEFS = {
+  ...PRINCIPLE_EXPLANATIONS,
+  ...CONNECTION_EXPLANATIONS,
+  ...GEOMETRY_EXPLANATIONS,
+  ...FRACTAL_PATTERN_EXPLANATIONS,
+  ...ASTROLOGY_EXPLANATIONS,
+  ...SEPHIRAH_EXPLANATIONS,
+  ...HEBREW_LETTER_EXPLANATIONS
+};
+
 const majorArcanaData = [
 {"name": "The Fool", "card_number": 0, "color": "#FBBF24", "core_theme": {"positive": "Innocent Potential", "neutral": "Uncharted Journey", "negative": "Reckless Folly"}, "archetypal_principles": {"Initiation": 1, "Will": 0, "Intuition": 0, "Nurturing": 0, "Structure": -1, "Guidance": 0, "Choice": 1, "Control": -1, "Courage": 1, "Introspection": 0, "Cycles": 0, "Balance": 0, "Perspective": 1, "Transformation": 0, "Harmony": 0, "Shadow": -1, "Revelation": 0, "Hope": 1, "Subconscious": 1, "Clarity": 0, "Awakening": 0, "Completion": -1, "Chaos": 1, "Order": -1, "Freedom": 1, "Constraint": -1, "Growth": 1, "Decay": 0, "Light": 1, "Darkness": 0, "Emanation": 1, "Containment": -1, "DivineFlow": 1, "Manifestation": 0, "Concealment": 0}, "fractal_signatures_embedded": ["The Magician", "The World", "Death", "The Star"], "unique_symbols": ["cliff", "white rose", "dog", "sun", "backpack", "butterfly"], "primary_geometry_type": "Mobius", "primary_fractal_pattern": "WaterRipples", "hebrew_letter": "Aleph", "gematria_value": 1, "kabbalistic_path_number": 11, "astrological_correspondence": "Element: Air", "astrological_modality": null, "path_from_sephirah": "Kether", "path_to_sephirah": "Chokmah"},
 {"name": "The Magician", "card_number": 1, "color": "#FDE047", "core_theme": {"positive": "Creative Will", "neutral": "Manifestation", "negative": "Manipulation"}, "archetypal_principles": {"Initiation": 1, "Will": 1, "Intuition": 0, "Nurturing": 0, "Structure": 1, "Guidance": 1, "Choice": 0, "Control": 1, "Courage": 0, "Introspection": 0, "Cycles": 0, "Balance": 1, "Perspective": 0, "Transformation": 1, "Harmony": 0, "Shadow": -1, "Revelation": 0, "Hope": 0, "Subconscious": 0, "Clarity": 1, "Awakening": 1, "Completion": 0, "Chaos": 0, "Order": 1, "Freedom": 0, "Constraint": 0, "Growth": 1, "Decay": 0, "Light": 1, "Darkness": 0, "Emanation": 1, "Containment": 0, "DivineFlow": 1, "Manifestation": 1, "Concealment": 0}, "fractal_signatures_embedded": ["The Fool", "The High Priestess", "The Devil", "The Sun"], "unique_symbols": ["wand", "table", "elements (air, fire, water, earth)", "lemniscate", "serpent"], "primary_geometry_type": "Tetrahedron", "primary_fractal_pattern": "CrystalLattice", "hebrew_letter": "Beth", "gematria_value": 2, "kabbalistic_path_number": 12, "astrological_correspondence": "Planet: Mercury", "astrological_modality": null, "path_from_sephirah": "Kether", "path_to_sephirah": "Binah"},
@@ -270,7 +280,8 @@ function generateSingleCardInterpretation(card) {
   const principles = values
     .map(([k, v]) => {
       const color = v > 0 ? 'bg-green-400' : 'bg-red-400';
-      return `<details class="mb-1"><summary class="cursor-pointer flex items-center"><span class="w-2 h-2 mr-2 rounded-full ${color}"></span><strong>${k}</strong></summary><div class="text-gray-400 pl-4 mt-1">${PRINCIPLE_EXPLANATIONS[k] || ''}</div></details>`;
+      const reason = v > 0 ? 'This theme strongly influences the card.' : 'This theme emerges as a challenge to integrate.';
+      return `<details class="mb-1"><summary class="cursor-pointer flex items-center"><span class="w-2 h-2 mr-2 rounded-full ${color}"></span><strong>${k}</strong></summary><div class="text-gray-400 pl-4 mt-1">${PRINCIPLE_EXPLANATIONS[k] || ''}<br><em>${reason}</em></div></details>`;
     })
     .join('');
   return `
@@ -339,7 +350,8 @@ function generateCombinationInterpretation(cards, allLinks) {
   const comboPrinciples = comboValues
     .map(([k, v]) => {
       const color = v > 0 ? 'bg-green-400' : 'bg-red-400';
-      return `<details class="mb-1"><summary class="cursor-pointer flex items-center"><span class="w-2 h-2 mr-2 rounded-full ${color}"></span><strong>${k}</strong></summary><div class="text-gray-400 pl-4 mt-1">${PRINCIPLE_EXPLANATIONS[k] || ''}</div></details>`;
+      const reason = v > 0 ? 'This theme guides the constellation.' : 'This theme highlights collective shadows.';
+      return `<details class="mb-1"><summary class="cursor-pointer flex items-center"><span class="w-2 h-2 mr-2 rounded-full ${color}"></span><strong>${k}</strong></summary><div class="text-gray-400 pl-4 mt-1">${PRINCIPLE_EXPLANATIONS[k] || ''}<br><em>${reason}</em></div></details>`;
     })
     .join('');
   if (comboPrinciples) {
@@ -419,6 +431,8 @@ assignAndNormalizeWeights(nodes, links);
 const width = window.innerWidth;
 const height = window.innerHeight;
 
+const floatAngles = nodes.map(() => Math.random() * Math.PI * 2);
+
 const svg = d3.select('#tarot-graph');
 const tooltip = d3.select('#tooltip');
 const narrativeHub = d3.select('#narrative-hub');
@@ -426,6 +440,7 @@ const narrativeTabs = d3.select('#narrative-tabs');
 const narrativeContentArea = d3.select('#narrative-content-area');
 const backBtn = d3.select('#back-btn');
 const resetBtn = d3.select('#reset-btn');
+const glossaryBtn = d3.select('#glossary-btn');
 
 let selectionHistory = [];
 
@@ -433,6 +448,16 @@ const simulation = d3.forceSimulation(nodes)
   .force('link', d3.forceLink(links).id(d=>d.id).strength(0.05).distance(200))
   .force('charge', d3.forceManyBody().strength(-250))
   .force('center', d3.forceCenter(width/2, height/2));
+
+function orbitForce(alpha){
+  nodes.forEach((n,i)=>{
+    floatAngles[i]+=0.001;
+    n.vx+=Math.cos(floatAngles[i])*0.1*alpha;
+    n.vy+=Math.sin(floatAngles[i])*0.1*alpha;
+  });
+}
+simulation.force('orbit', orbitForce);
+d3.interval(()=>simulation.alpha(0.05).restart(),10000);
 
 const linkGroup = svg.append('g').attr('class','links');
 const nodeGroup = svg.append('g').attr('class','nodes');
@@ -493,6 +518,16 @@ backBtn.on('click', () => {
 });
 
 resetBtn.on('click', () => { selectionHistory=[]; updateFocusAndNarrative(); });
+glossaryBtn.on('click', () => {
+  if(selectionHistory.length===0){
+    narrativeHub.classed('show', true);
+    narrativeTabs.html('<div class="narrative-tab active" data-target="pane-glossary">Glossary</div>');
+    narrativeContentArea.html('<div class="narrative-pane active" id="pane-glossary">'+generateGlossary()+'</div>');
+    attachGlossaryEvents();
+  } else {
+    d3.select("[data-target='pane-glossary']").dispatch('click');
+  }
+});
 
 function updateFocusAndNarrative() { updateFocusState(); updateNarrative(); }
 
@@ -583,13 +618,29 @@ function updateNarrative() {
     d3.select(this).classed('active', true);
     d3.select('#'+this.dataset.target).classed('active', true);
   });
-  d3.selectAll('.glossary-link').on('click', function(e){
-    e.preventDefault();
-    d3.select("[data-target='pane-glossary']").dispatch('click');
-    const id = this.getAttribute('href');
-    const el = document.querySelector(id);
-    if (el) el.scrollIntoView({behavior:'smooth'});
-  });
+  attachGlossaryEvents();
+}
+
+function attachGlossaryEvents() {
+  d3.selectAll('.glossary-link')
+    .on('click', function(e){
+      e.preventDefault();
+      d3.select("[data-target='pane-glossary']").dispatch('click');
+      const id = this.getAttribute('href');
+      const el = document.querySelector(id);
+      if (el) el.scrollIntoView({behavior:'smooth'});
+    })
+    .on('mouseover', function(event){
+      const term = this.textContent.trim();
+      const def = ALL_GLOSSARY_DEFS[term] || '';
+      if(def){
+        tooltip.style('visibility','visible').style('opacity',1).html(`<div class="text-sm">${def}</div>`);
+      }
+    })
+    .on('mousemove', event => {
+      tooltip.style('top',(event.pageY-10)+'px').style('left',(event.pageX+10)+'px');
+    })
+    .on('mouseout', () => { tooltip.style('visibility','hidden').style('opacity',0); });
 }
 
 function drag(simulation) {
