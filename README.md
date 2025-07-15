@@ -38,3 +38,8 @@ npm run package
 ```
 
 The resulting application will appear in a folder named `tarot-explorer-*`.
+
+## License
+
+This project is released under the [MIT License](LICENSE).
+
