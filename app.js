@@ -677,6 +677,7 @@ function updateNarrative() {
   narrativeContentArea.append('div').attr('id','pane-glossary').attr('class','narrative-pane')
     .html(generateGlossary());
   attachGlossaryEvents();
+  bindTabEvents();
 }
 
 function bindTabEvents(){
