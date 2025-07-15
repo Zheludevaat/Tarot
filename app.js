@@ -466,14 +466,16 @@ function generateGlossary() {
 }
 async function init(){
   try {
-    const resp = await fetch(new URL('./assets/majorArcana.json', import.meta.url));
+    // Load tarot data relative to the HTML file
+    const resp = await fetch('assets/majorArcana.json');
     majorArcanaData = await resp.json();
   } catch(err){
+    // Fallback for non-browser environments
     if (typeof require !== 'undefined') {
       const fs = require('fs');
-      const p = new URL('./assets/majorArcana.json', import.meta.url);
-      majorArcanaData = JSON.parse(fs.readFileSync(p, 'utf8'));
+      majorArcanaData = JSON.parse(fs.readFileSync('assets/majorArcana.json', 'utf8'));
     } else {
+      console.error('Failed to load tarot data', err);
       throw err;
     }
   }
