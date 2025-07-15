@@ -293,6 +293,22 @@ function generateSingleCardInterpretation(card) {
   </div>
   `;
 }
+function principleDelta(before, after){
+  const inc = [], dec = [];
+  Object.keys(after).forEach(k=>{
+    const diff = (after[k]||0)-(before[k]||0);
+    if(diff>0) inc.push(k);
+    if(diff<0) dec.push(k);
+  });
+  let text='';
+  if(inc.length) text += 'reinforcing ' + inc.slice(0,2).join(', ');
+  if(dec.length){
+    if(text) text += '; ';
+    text += 'revealing shadows of ' + dec.slice(0,2).join(', ');
+  }
+  return text;
+}
+
 function generateCombinationInterpretation(cards, allLinks) {
   if (!cards.length) return '';
   let html = '';
@@ -302,27 +318,33 @@ function generateCombinationInterpretation(cards, allLinks) {
   const root = cards[0];
   html += `<p class="text-gray-300 text-sm leading-relaxed mb-4">The constellation grows from <strong>${root.name}</strong>, whose core theme is <strong>${root.core_theme.neutral}</strong>. Each additional card layers new meaning onto this foundation.</p>`;
 
-  const combined = { ...root.archetypal_principles };
+  let combined = { ...root.archetypal_principles };
   let steps = '';
   for (let i = 1; i < cards.length; i++) {
     const card = cards[i];
     steps += `<div class="mt-4"><h4 class="font-semibold text-gray-100">${card.name}</h4>`;
     steps += `<p class="text-gray-300 text-sm leading-relaxed">${card.core_theme.neutral} interacts with ${root.name.toLowerCase()} to expand the narrative.</p>`;
 
-    const pairLink = allLinks.find(l => (l.source.id===root.id && l.target.id===card.id) || (l.source.id===card.id && l.target.id===root.id));
-    if (pairLink) {
-      steps += '<ul class="text-sm text-gray-300 pl-4 space-y-1">';
-      pairLink.types.forEach(type => {
-        const explain = CONNECTION_EXPLANATIONS[type] || '';
-        const weightDesc = getWeightDescription(pairLink.weight);
-        steps += `<li><strong>${weightDesc}</strong> - ${explain}</li>`;
-      });
-      steps += '</ul>';
+    const pairConnections = [];
+    for (let j=0;j<i;j++){
+      const other = cards[j];
+      const lnk = allLinks.find(l=> (l.source.id===other.id && l.target.id===card.id) || (l.source.id===card.id && l.target.id===other.id));
+      if(lnk){
+        const desc = lnk.types.map(t=>`<span>${t}</span>`).join(', ');
+        const weightDesc = getWeightDescription(lnk.weight);
+        pairConnections.push(`${other.name} via <em>${desc}</em> (<strong>${weightDesc}</strong>)`);
+      }
+    }
+    if(pairConnections.length){
+      steps += `<p class="text-sm text-gray-300 pl-4">Connected to ${pairConnections.join('; ')}.</p>`;
     }
 
-    Object.entries(card.archetypal_principles).forEach(([k,v]) => {
-      combined[k] = (combined[k] || 0) + v;
+    const before = { ...combined };
+    Object.entries(card.archetypal_principles).forEach(([k,v])=>{
+      combined[k] = (combined[k]||0)+v;
     });
+    const diffText = principleDelta(before, combined);
+    if(diffText) steps += `<p class="text-xs text-gray-400 pl-4">${diffText}</p>`;
     steps += '</div>';
   }
 
@@ -660,4 +682,6 @@ connectionLegend.html('<strong>Connection Strength</strong><ul class="mt-1 space
 updateFocusAndNarrative();
 }
 
-init();
+if (typeof window !== 'undefined') {
+  init();
+}
