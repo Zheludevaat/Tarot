@@ -61,8 +61,12 @@ const CONNECTION_EXPLANATIONS = {
     "Numerical values align closely, hinting at occult synchronicity."
 };
 
+function safeId(str){
+  return str.replace(/[^\w-]/g,'-');
+}
+
 function glossaryLink(term) {
-  return `<a href="#glossary-${term.replace(/\s+/g,'-')}" class="underline glossary-link">${term}</a>`;
+  return `<a href="#glossary-${safeId(term)}" class="underline glossary-link">${term}</a>`;
 }
 
 const GEOMETRY_EXPLANATIONS = {
@@ -434,9 +438,9 @@ function summarizePrinciples(values){
 
 function generateGlossary() {
   function renderSection(title, obj) {
-    const id = 'glossary-' + title.replace(/\s+/g,'-');
+    const id = 'glossary-' + safeId(title);
     const entries = Object.entries(obj).map(([term,def]) =>
-      `<p id="glossary-${term.replace(/\s+/g,'-')}" class="text-gray-300"><strong>${term}:</strong> ${def}</p>`).join('');
+      `<p id="glossary-${safeId(term)}" class="text-gray-300"><strong>${term}:</strong> ${def}</p>`).join('');
     return `<details id="${id}" class="mb-4"><summary class="cursor-pointer font-semibold text-gray-100">${title}</summary><div class="mt-2 pl-4 space-y-1">${entries}</div></details>`;
   }
   return `
@@ -634,7 +638,7 @@ function updateNarrative() {
   }
   selectionHistory.forEach(card => {
     narrativeTabs.append('div').attr('class', `narrative-tab ${selectionHistory.length===1?'active':''}`)
-      .attr('data-target', `pane-${card.id.replace(/\s+/g,'-')}`)
+      .attr('data-target', `pane-${safeId(card.id)}`)
       .text(card.name);
   });
   narrativeTabs.append('div').attr('class','narrative-tab')
@@ -644,7 +648,7 @@ function updateNarrative() {
       .html(generateCombinationInterpretation(selectionHistory, links));
   }
   selectionHistory.forEach(card => {
-    narrativeContentArea.append('div').attr('id',`pane-${card.id.replace(/\s+/g,'-')}`)
+    narrativeContentArea.append('div').attr('id',`pane-${safeId(card.id)}`)
       .attr('class', `narrative-pane ${selectionHistory.length===1?'active':''}`)
       .html(generateSingleCardInterpretation(card));
   });
