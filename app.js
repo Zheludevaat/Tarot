@@ -429,6 +429,9 @@ function generateCombinationInterpretation(cards, allLinks) {
       }
     }
   }
+  if(html.endsWith('<ul class="space-y-4 text-sm text-gray-300">')) {
+    html += '<li class="text-gray-400">No direct connections found.</li>';
+  }
   html += '</ul>';
   return html;
 }
@@ -462,8 +465,18 @@ function generateGlossary() {
   `;
 }
 async function init(){
-  const resp = await fetch(new URL('./assets/majorArcana.json', import.meta.url));
-  majorArcanaData = await resp.json();
+  try {
+    const resp = await fetch(new URL('./assets/majorArcana.json', import.meta.url));
+    majorArcanaData = await resp.json();
+  } catch(err){
+    if (typeof require !== 'undefined') {
+      const fs = require('fs');
+      const p = new URL('./assets/majorArcana.json', import.meta.url);
+      majorArcanaData = JSON.parse(fs.readFileSync(p, 'utf8'));
+    } else {
+      throw err;
+    }
+  }
   ({ nodes, links } = buildGraphData());
   assignAndNormalizeWeights(nodes, links);
 
