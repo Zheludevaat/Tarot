@@ -9,6 +9,8 @@ fs.mkdirSync(cacheDir, { recursive: true });
 app.setPath('userData', userDir);
 app.setPath('cache', cacheDir);
 app.commandLine.appendSwitch('disk-cache-dir', cacheDir);
+app.commandLine.appendSwitch('disable-http-cache');
+app.commandLine.appendSwitch('disable-gpu-shader-disk-cache');
 function createWindow () {
   const win = new BrowserWindow({
     width: 1000,
