@@ -28,3 +28,13 @@ Without a graphical environment Electron cannot launch.
 A window will open displaying `index.html` with the interactive tarot visualization.
 
 If you need help with any of the steps above, let us know which operating system you're using so we can provide more specific instructions.
+
+## Packaging
+
+To create a standalone build for your current platform, run:
+
+```bash
+npm run package
+```
+
+The resulting application will appear in a folder named `tarot-explorer-*`.

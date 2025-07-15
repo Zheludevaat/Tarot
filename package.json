@@ -4,9 +4,11 @@
   "main": "main.js",
   "scripts": {
     "start": "electron .",
-    "launch": "node launch.js"
+    "launch": "node launch.js",
+    "package": "electron-packager . tarot-explorer --overwrite"
   },
   "devDependencies": {
-    "electron": "^37.2.1"
+    "electron": "^37.2.1",
+    "electron-packager": "^17.1.1"
   }
 }
