@@ -39,6 +39,8 @@ npm run package
 
 The resulting application will appear in a folder named `tarot-explorer-*`.
 
+Electron stores its cache in a temporary folder inside your user directory to avoid permission errors. You can safely delete this folder if needed.
+
 ## License
 
 This project is released under the [MIT License](LICENSE).

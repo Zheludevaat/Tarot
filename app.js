@@ -483,6 +483,8 @@ async function init(){
   closeBtn = d3.select('#close-hub');
   connectionLegend = d3.select('#connection-legend');
 
+  bindTabEvents();
+
 let selectionHistory = [];
 
 simulation = d3.forceSimulation(nodes)
@@ -569,7 +571,6 @@ glossaryBtn.on('click', () => {
       narrativeHub.classed('show', true);
       narrativeTabs.html('<div class="narrative-tab active" data-target="pane-glossary">Glossary</div>');
       narrativeContentArea.html('<div class="narrative-pane active" id="pane-glossary">'+generateGlossary()+'</div>');
-      bindTabEvents();
       attachGlossaryEvents();
     }
   } else {
@@ -662,16 +663,17 @@ function updateNarrative() {
   });
   narrativeContentArea.append('div').attr('id','pane-glossary').attr('class','narrative-pane')
     .html(generateGlossary());
-  bindTabEvents();
   attachGlossaryEvents();
 }
 
 function bindTabEvents(){
-  d3.selectAll('.narrative-tab').on('click', function(){
+  narrativeTabs.on('click', (event) => {
+    const tab = event.target.closest('.narrative-tab');
+    if (!tab) return;
     d3.selectAll('.narrative-tab').classed('active', false);
     d3.selectAll('.narrative-pane').classed('active', false);
-    d3.select(this).classed('active', true);
-    d3.select('#'+this.dataset.target).classed('active', true);
+    d3.select(tab).classed('active', true);
+    d3.select('#' + tab.dataset.target).classed('active', true);
   });
 }
 
