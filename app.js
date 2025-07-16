@@ -330,112 +330,59 @@ function lookupLink(id1, id2, all){
   }) || null;
 }
 
-function generateCombinationInterpretation(cards, allLinks) {
-  if (!cards.length) return '';
-  let html = '';
-  const header = cards.map(c => `<span class="font-bold title-font text-xl" style="color:${c.color};">${c.name}</span>`).join(' & ');
-  html += `<h2 class="text-2xl mb-4">${header}</h2>`;
-
+function buildConstellation(cards, allLinks) {
   const root = cards[0];
-  html += `<p class="text-gray-300 text-sm leading-relaxed mb-4">The constellation grows from <strong>${root.name}</strong>, whose core theme is <strong>${root.core_theme.neutral}</strong>. Each additional card layers new meaning onto this foundation.</p>`;
-
-  let combined = { ...root.archetypal_principles };
-  let steps = '';
+  const combined = { ...root.archetypal_principles };
+  const steps = [];
   for (let i = 1; i < cards.length; i++) {
     const card = cards[i];
-    steps += `<div class="mt-4"><h4 class="font-semibold text-gray-100">${card.name}</h4>`;
-    steps += `<p class="text-gray-300 text-sm leading-relaxed">${card.core_theme.neutral} interacts with ${root.name.toLowerCase()} to expand the narrative.</p>`;
-
-    const pairConnections = [];
-    for (let j=0;j<i;j++){
+    const connections = [];
+    for (let j = 0; j < i; j++) {
       const other = cards[j];
-      const lnk = lookupLink(other.id, card.id, allLinks);
-      if(lnk){
-        const desc = lnk.types.map(t=>`<span>${t}</span>`).join(', ');
-        const weightDesc = getWeightDescription(lnk.weight);
-        pairConnections.push(`${other.name} via <em>${desc}</em> (<strong>${weightDesc}</strong>)`);
-      }
+      const link = lookupLink(card.id, other.id, allLinks);
+      if (link) connections.push({ other, link });
     }
-    if(pairConnections.length){
-      steps += `<p class="text-sm text-gray-300 pl-4">Connected to ${pairConnections.join('; ')}.</p>`;
-    }
-
-    const before = { ...combined };
-    Object.entries(card.archetypal_principles).forEach(([k,v])=>{
-      combined[k] = (combined[k]||0)+v;
+    steps.push({ card, connections });
+    Object.entries(card.archetypal_principles).forEach(([k, v]) => {
+      combined[k] = (combined[k] || 0) + v;
     });
-    const diffText = principleDelta(before, combined);
-    if(diffText) steps += `<p class="text-xs text-gray-400 pl-4">${diffText}</p>`;
-    steps += '</div>';
   }
+  return { root, steps, combined };
+}
 
-  html += steps;
+function renderConstellation(data) {
+  if (!data) return '';
+  const { root, steps, combined } = data;
+  let html = `<h2 class="text-2xl mb-4"><span class="font-bold title-font text-xl" style="color:${root.color};">${root.name}</span>`;
+  if (steps.length) {
+    const others = steps.map(s => `<span class="font-bold title-font text-xl" style="color:${s.card.color};">${s.card.name}</span>`).join(' & ');
+    html += ` & ${others}`;
+  }
+  html += '</h2>';
+  html += `<p class="text-gray-300 text-sm leading-relaxed mb-4">This constellation begins with <strong>${root.name}</strong>, radiating the theme of <strong>${root.core_theme.neutral}</strong>. Each selected card adds new layers to this narrative.</p>`;
 
-  const comboValues = Object.entries(combined).filter(([, v]) => v !== 0);
-  const comboPos = comboValues.filter(([, v]) => v > 0).length;
-  const comboNeg = comboValues.filter(([, v]) => v < 0).length;
-  const comboPrinciples = comboValues
-    .map(([k, v]) => {
-      const color = v > 0 ? 'bg-green-400' : 'bg-red-400';
-      const reason = v > 0 ? 'This theme guides the constellation.' : 'This theme highlights collective shadows.';
-      return `<details class="mb-1"><summary class="cursor-pointer flex items-center"><span class="w-2 h-2 mr-2 rounded-full ${color}"></span><strong>${k}</strong></summary><div class="text-gray-400 pl-4 mt-1">${PRINCIPLE_EXPLANATIONS[k] || ''}<br><em>${reason}</em></div></details>`;
-    })
-    .join('');
-  if (comboPrinciples) {
+  steps.forEach(step => {
+    html += `<div class="mt-4"><h4 class="font-semibold text-gray-100">${step.card.name}</h4>`;
+    html += `<p class="text-gray-300 text-sm leading-relaxed">${step.card.core_theme.neutral} integrates with the existing pattern.</p>`;
+    if (step.connections.length) {
+      const conns = step.connections.map(c => {
+        const desc = c.link.types.join(', ');
+        const weight = getWeightDescription(c.link.weight);
+        return `${c.other.name} via <em>${desc}</em> (<strong>${weight}</strong>)`;
+      }).join('; ');
+      html += `<p class="text-sm text-gray-300 pl-4">Connected to ${conns}.</p>`;
+    }
+    html += '</div>';
+  });
+
+  const values = Object.entries(combined).filter(([, v]) => v !== 0);
+  const pos = values.filter(([, v]) => v > 0).slice(0,3).map(([k]) => k);
+  const neg = values.filter(([, v]) => v < 0).slice(0,3).map(([k]) => k);
+  if (pos.length || neg.length) {
     html += `<h3 class="font-bold title-font text-lg text-gray-100 mt-6 mb-2">Overall Archetypal Currents</h3>`;
-    html += `<p class="text-xs text-gray-400 mb-1"><span class="inline-block w-2 h-2 bg-green-400 rounded-full mr-1"></span>dominant &nbsp; <span class="inline-block w-2 h-2 bg-red-400 rounded-full mr-1"></span>shadow &nbsp; <span class="text-gray-500">(${comboPos}/${comboNeg})</span></p>`;
-    html += `<div class="text-sm text-gray-300 mb-4 space-y-2">${comboPrinciples}</div>`;
     html += summarizePrinciples(combined);
   }
 
-  html += `<h3 class="font-bold title-font text-lg text-gray-100 mb-2">Points of Interaction</h3>`;
-  html += '<ul class="space-y-4 text-sm text-gray-300">';
-
-  for (let i=0; i<cards.length; i++) {
-    for (let j=i+1; j<cards.length; j++) {
-      const c1 = cards[i];
-      const c2 = cards[j];
-      const link = lookupLink(c1.id, c2.id, allLinks);
-      if (link) {
-        link.types.forEach(type => {
-          let summary='';
-          switch(type) {
-            case 'Fractal Embedding':
-              summary = `A ${glossaryLink('Fractal Embedding')} reveals how ${c1.name} mirrors patterns within ${c2.name}.`;
-              break;
-            case 'Symbol Echo':
-              summary = `${glossaryLink('Symbol Echo')} shows a mutual resonance of symbols.`;
-              break;
-            case 'Shared Geometry':
-              summary = `Both share the geometry of <strong>${c1.primary_geometry_type}</strong>.`;
-              break;
-            case 'Shared Astrology':
-              summary = `Unified under <strong>${c1.astrological_correspondence}</strong>.`;
-              break;
-            case 'Astrological Opposition':
-              summary = `${glossaryLink('Astrological Opposition')} creates balanced tension.`;
-              break;
-            case 'Complementary Sephiroth':
-              summary = `${glossaryLink('Complementary Sephiroth')} complete each other.`;
-              break;
-            case 'Gematria Resonance':
-              summary = `${glossaryLink('Gematria Resonance')} shows closely aligned values.`;
-              break;
-          }
-          if (summary) {
-            const explain = CONNECTION_EXPLANATIONS[type] || '';
-            const weightDesc = getWeightDescription(link.weight);
-            summary = `<strong>${weightDesc}</strong> - ${summary}`;
-            html += `<li class="p-3 bg-gray-900/50 rounded-md border-l-2 border-purple-400"><details><summary class="cursor-pointer">${summary}</summary><div class="text-gray-400 mt-1 pl-2">${explain}</div></details></li>`;
-          }
-        });
-      }
-    }
-  }
-  if(html.endsWith('<ul class="space-y-4 text-sm text-gray-300">')) {
-    html += '<li class="text-gray-400">No direct connections found.</li>';
-  }
-  html += '</ul>';
   return html;
 }
 
@@ -672,8 +619,11 @@ function updateNarrative() {
   narrativeTabs.append('div').attr('class','narrative-tab')
     .attr('data-target','pane-glossary').text('Glossary');
   if (selectionHistory.length>1) {
-    narrativeContentArea.append('div').attr('id','pane-constellation').attr('class','narrative-pane active')
-      .html(generateCombinationInterpretation(selectionHistory, links));
+    const constellationData = buildConstellation(selectionHistory, links);
+    narrativeContentArea.append('div')
+      .attr('id','pane-constellation')
+      .attr('class','narrative-pane active')
+      .html(renderConstellation(constellationData));
   }
   selectionHistory.forEach(card => {
     narrativeContentArea.append('div').attr('id',`pane-${card.id}`)
