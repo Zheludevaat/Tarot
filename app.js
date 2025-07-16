@@ -198,7 +198,7 @@ let links = [];
 let width, height;
 let floatAngles = [];
 let svg, tooltip, narrativeHub, narrativeTabs, narrativeContentArea;
-let backBtn, resetBtn, glossaryBtn, closeBtn, connectionLegend;
+let backBtn, resetBtn, glossaryBtn, closeBtn;
 let simulation, linkGroup, nodeGroup, linkSelection, nodeSelection;
 
 function getCardByName(name) {
@@ -306,70 +306,6 @@ function generateSingleCardInterpretation(card) {
   </div>
   `;
 }
-function principleDelta(before, after){
-  const inc = [], dec = [];
-  Object.keys(after).forEach(k=>{
-    const diff = (after[k]||0)-(before[k]||0);
-    if(diff>0) inc.push(k);
-    if(diff<0) dec.push(k);
-  });
-  let text='';
-  if(inc.length) text += 'reinforcing ' + inc.slice(0,2).join(', ');
-  if(dec.length){
-    if(text) text += '; ';
-    text += 'revealing shadows of ' + dec.slice(0,2).join(', ');
-  }
-  return text;
-}
-
-function lookupLink(id1, id2, all){
-  return all.find(l => {
-    const s = typeof l.source === 'object' ? l.source.id : l.source;
-    const t = typeof l.target === 'object' ? l.target.id : l.target;
-    return (s === id1 && t === id2) || (s === id2 && t === id1);
-  }) || null;
-}
-
-
-function buildConnectionsSummary(cards, allLinks){
-  if(cards.length<2) return "";
-  let html = `<h2 class="text-2xl mb-4">Card Connections</h2>`;
-  html += '<ul class="space-y-2">';
-  for(let i=0;i<cards.length;i++){
-    for(let j=i+1;j<cards.length;j++){
-      const c1 = cards[i];
-      const c2 = cards[j];
-      const link = lookupLink(c1.id,c2.id,allLinks);
-      if(link){
-        const desc = link.types.join(", ");
-        const weight = getWeightDescription(link.weight);
-        html += `<li><strong style="color:${c1.color}">${c1.name}</strong> ↔ <strong style="color:${c2.color}">${c2.name}</strong>: ${desc} (<em>${weight}</em>)</li>`;
-      }else{
-        html += `<li><strong style="color:${c1.color}">${c1.name}</strong> ↔ <strong style="color:${c2.color}">${c2.name}</strong>: <em>No direct link</em></li>`;
-      }
-    }
-  }
-  html += "</ul>";
-  const combined = {};
-  cards.forEach(c=>{
-    Object.entries(c.archetypal_principles).forEach(([k,v])=>{
-      combined[k]=(combined[k]||0)+v;
-    });
-  });
-  html += `<h3 class="font-bold title-font text-lg text-gray-100 mt-6 mb-2">Overall Archetypal Currents</h3>`;
-  html += summarizePrinciples(combined);
-  return html;
-}
-
-function summarizePrinciples(values){
-  const sorted = Object.entries(values).sort((a,b)=>Math.abs(b[1])-Math.abs(a[1]));
-  const pos = sorted.filter(([,v])=>v>0).slice(0,3).map(([k])=>k);
-  const neg = sorted.filter(([,v])=>v<0).slice(0,3).map(([k])=>k);
-  let text='';
-  if(pos.length) text += 'Dominant forces: '+pos.join(', ')+'. ';
-  if(neg.length) text += 'Shadow influences: '+neg.join(', ')+'.';
-  return `<p class="text-gray-300 text-sm mb-4">${text}</p>`;
-}
 
 function generateGlossary() {
   function renderSection(title, obj) {
@@ -422,7 +358,6 @@ async function init(){
   resetBtn = d3.select('#reset-btn');
   glossaryBtn = d3.select('#glossary-btn');
   closeBtn = d3.select('#close-hub');
-  connectionLegend = d3.select('#connection-legend');
 
   bindTabEvents();
 
@@ -474,8 +409,7 @@ function getWeightDescription(w) {
 }
 
 nodeSelection.on('click', (event,d) => {
-  if (selectionHistory.includes(d)) return;
-  selectionHistory.push(d);
+  selectionHistory = [d];
   updateFocusAndNarrative();
 });
 
@@ -583,28 +517,15 @@ function updateNarrative() {
     narrativeContentArea.html(`<div class="narrative-pane active text-center text-gray-400 p-4"><p>Your journey begins here.</p><p class="text-sm mt-2">Select a card from the cosmic web to receive its interpretation.</p></div>`);
     return;
   }
-  if (selectionHistory.length>1) {
-    narrativeTabs.append('div').attr('class','narrative-tab active').attr('data-target','pane-connections').text('Connections');
-  }
-  selectionHistory.forEach(card => {
-    narrativeTabs.append('div').attr('class', `narrative-tab ${selectionHistory.length===1?'active':''}`)
-      .attr('data-target', `pane-${card.id}`)
-      .text(card.name);
-  });
+  const card = selectionHistory[0];
+  narrativeTabs.append('div').attr('class','narrative-tab active')
+    .attr('data-target', `pane-${card.id}`)
+    .text(card.name);
   narrativeTabs.append('div').attr('class','narrative-tab')
     .attr('data-target','pane-glossary').text('Glossary');
-  if (selectionHistory.length>1) {
-    const connectionsHtml = buildConnectionsSummary(selectionHistory, links);
-    narrativeContentArea.append('div')
-      .attr('id','pane-connections')
-      .attr('class','narrative-pane active')
-      .html(connectionsHtml);
-  }
-  selectionHistory.forEach(card => {
-    narrativeContentArea.append('div').attr('id',`pane-${card.id}`)
-      .attr('class', `narrative-pane ${selectionHistory.length===1?'active':''}`)
-      .html(generateSingleCardInterpretation(card));
-  });
+  narrativeContentArea.append('div').attr('id',`pane-${card.id}`)
+    .attr('class','narrative-pane active')
+    .html(generateSingleCardInterpretation(card));
   narrativeContentArea.append('div').attr('id','pane-glossary').attr('class','narrative-pane')
     .html(generateGlossary());
   attachGlossaryEvents();
@@ -656,7 +577,6 @@ const zoom = d3.zoom().scaleExtent([0.1,4]).on('zoom', event => {
   linkGroup.attr('transform', event.transform);
 });
 svg.call(zoom);
-connectionLegend.html('<strong>Connection Strength</strong><ul class="mt-1 space-y-0.5"><li>A Profound Connection ≥7</li><li>A Strong Resonance 5‑6</li><li>A Subtle Link 3‑4</li><li>A Faint Echo 1‑2</li></ul>');
 updateFocusAndNarrative();
 }
 
