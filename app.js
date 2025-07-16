@@ -205,20 +205,23 @@ function getCardByName(name) {
   return majorArcanaData.find(c => c.name === name) || null;
 }
 
-function buildGraphData() {
-  const idMap = new Map();
-  majorArcanaData.forEach(card => {
-    idMap.set(card.name, safeId(card.name));
+function normalizeData(data){
+  data.forEach(card => {
+    card.id = safeId(card.name);
+    card.fractal_signatures_embedded = card.fractal_signatures_embedded.map(n => safeId(n));
   });
-  const nodes = majorArcanaData.map(card => ({ id: idMap.get(card.name), ...card }));
+}
+
+function buildGraphData() {
+  const nodes = majorArcanaData.map(card => ({ ...card }));
   const links = [];
   for (let i = 0; i < nodes.length; i++) {
     for (let j = i + 1; j < nodes.length; j++) {
       const card1 = nodes[i];
       const card2 = nodes[j];
       let types = new Set();
-      const card1Embeds = card1.fractal_signatures_embedded.map(n=>idMap.get(n));
-      const card2Embeds = card2.fractal_signatures_embedded.map(n=>idMap.get(n));
+      const card1Embeds = card1.fractal_signatures_embedded;
+      const card2Embeds = card2.fractal_signatures_embedded;
       if (card2Embeds.includes(card1.id) || card1Embeds.includes(card2.id)) types.add("Fractal Embedding");
       if (card1.unique_symbols.some(s => card2.unique_symbols.includes(s))) types.add("Symbol Echo");
       if (card1.primary_geometry_type === card2.primary_geometry_type) types.add("Shared Geometry");
@@ -479,6 +482,7 @@ async function init(){
       throw err;
     }
   }
+  normalizeData(majorArcanaData);
   ({ nodes, links } = buildGraphData());
   assignAndNormalizeWeights(nodes, links);
 
