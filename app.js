@@ -270,6 +270,39 @@ function assignAndNormalizeWeights(nodes, links) {
   });
   return links;
 }
+
+function lookupLink(id1, id2, allLinks){
+  return allLinks.find(l => {
+    const s = typeof l.source === 'object' ? l.source.id : l.source;
+    const t = typeof l.target === 'object' ? l.target.id : l.target;
+    return (s === id1 && t === id2) || (s === id2 && t === id1);
+  }) || null;
+}
+
+function buildConstellationInterpretation(cards){
+  if(cards.length === 0) return '';
+  let html = `<h2 class="text-2xl mb-4">Constellation Starting With <span class="font-bold title-font" style="color:${cards[0].color};">${cards[0].name}</span></h2>`;
+  const aggregate = {};
+  cards.forEach(c => {
+    Object.entries(c.archetypal_principles).forEach(([p,v]) => {
+      aggregate[p] = (aggregate[p] || 0) + v;
+    });
+  });
+  const sorted = Object.entries(aggregate).sort((a,b)=>Math.abs(b[1])-Math.abs(a[1]));
+  const highlights = sorted.slice(0,5).map(([p,v])=>`<span class="${v>0?'text-green-300':'text-red-300'}">${p}</span>`).join(', ');
+  html += `<p class="text-gray-300 text-sm mb-4">Shared themes emerge around ${highlights}.</p>`;
+  for(let i=1;i<cards.length;i++){
+    const prev = cards[i-1];
+    const card = cards[i];
+    const link = lookupLink(prev.id, card.id, links);
+    html += `<h3 class="font-semibold text-gray-100 mt-3 mb-1">${prev.name} → ${card.name}</h3>`;
+    if(link){
+      html += `<p class="text-xs text-gray-400 mb-1">${getWeightDescription(link.weight)} (${link.types.join(', ')})</p>`;
+    }
+    html += `<p class="text-gray-300 text-sm mb-2">${card.name} adds <em>${card.core_theme.neutral.toLowerCase()}</em>, offering ${card.core_theme.positive.toLowerCase()} yet risking ${card.core_theme.negative.toLowerCase()}.</p>`;
+  }
+  return html;
+}
 function generateSingleCardInterpretation(card) {
   const values = Object.entries(card.archetypal_principles).filter(([, v]) => v !== 0);
   const posCount = values.filter(([, v]) => v > 0).length;
@@ -409,7 +442,12 @@ function getWeightDescription(w) {
 }
 
 nodeSelection.on('click', (event,d) => {
-  selectionHistory = [d];
+  const idx = selectionHistory.findIndex(c => c.id === d.id);
+  if (idx === -1) {
+    selectionHistory.push(d);
+  } else {
+    selectionHistory = selectionHistory.slice(0, idx + 1);
+  }
   updateFocusAndNarrative();
 });
 
@@ -513,21 +551,42 @@ function updateFocusState() {
 function updateNarrative() {
   narrativeTabs.html('');
   narrativeContentArea.html('');
-  if (selectionHistory.length===0) {
+  if (selectionHistory.length === 0) {
     narrativeContentArea.html(`<div class="narrative-pane active text-center text-gray-400 p-4"><p>Your journey begins here.</p><p class="text-sm mt-2">Select a card from the cosmic web to receive its interpretation.</p></div>`);
     return;
   }
-  const card = selectionHistory[0];
-  narrativeTabs.append('div').attr('class','narrative-tab active')
-    .attr('data-target', `pane-${card.id}`)
-    .text(card.name);
-  narrativeTabs.append('div').attr('class','narrative-tab')
-    .attr('data-target','pane-glossary').text('Glossary');
-  narrativeContentArea.append('div').attr('id',`pane-${card.id}`)
-    .attr('class','narrative-pane active')
-    .html(generateSingleCardInterpretation(card));
-  narrativeContentArea.append('div').attr('id','pane-glossary').attr('class','narrative-pane')
+
+  selectionHistory.forEach((card, idx) => {
+    narrativeTabs.append('div')
+      .attr('class', `narrative-tab ${idx===0?'active':''}`)
+      .attr('data-target', `pane-${card.id}`)
+      .text(card.name);
+    narrativeContentArea.append('div')
+      .attr('id', `pane-${card.id}`)
+      .attr('class', `narrative-pane ${idx===0?'active':''}`)
+      .html(generateSingleCardInterpretation(card));
+  });
+
+  if (selectionHistory.length > 1) {
+    narrativeTabs.append('div')
+      .attr('class','narrative-tab')
+      .attr('data-target','pane-constellation')
+      .text('Constellation');
+    narrativeContentArea.append('div')
+      .attr('id','pane-constellation')
+      .attr('class','narrative-pane')
+      .html(buildConstellationInterpretation(selectionHistory));
+  }
+
+  narrativeTabs.append('div')
+    .attr('class','narrative-tab')
+    .attr('data-target','pane-glossary')
+    .text('Glossary');
+  narrativeContentArea.append('div')
+    .attr('id','pane-glossary')
+    .attr('class','narrative-pane')
     .html(generateGlossary());
+
   attachGlossaryEvents();
   bindTabEvents();
 }
