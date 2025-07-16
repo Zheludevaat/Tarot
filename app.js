@@ -353,27 +353,24 @@ function buildConstellation(cards, allLinks) {
 function renderConstellation(data) {
   if (!data) return '';
   const { root, steps, combined } = data;
-  let html = `<h2 class="text-2xl mb-4"><span class="font-bold title-font text-xl" style="color:${root.color};">${root.name}</span>`;
-  if (steps.length) {
-    const others = steps.map(s => `<span class="font-bold title-font text-xl" style="color:${s.card.color};">${s.card.name}</span>`).join(' & ');
-    html += ` & ${others}`;
-  }
-  html += '</h2>';
-  html += `<p class="text-gray-300 text-sm leading-relaxed mb-4">This constellation begins with <strong>${root.name}</strong>, radiating the theme of <strong>${root.core_theme.neutral}</strong>. Each selected card adds new layers to this narrative.</p>`;
+
+  let html = `<h2 class="text-2xl mb-4">Constellation Starting With <span class="font-bold title-font text-xl" style="color:${root.color};">${root.name}</span></h2>`;
+  html += '<ol class="list-decimal list-inside space-y-4">';
+  html += `<li><div class="text-gray-300 text-sm leading-relaxed"><strong>${root.name}</strong> sets the tone with <em>${root.core_theme.neutral}</em>.</div></li>`;
 
   steps.forEach(step => {
-    html += `<div class="mt-4"><h4 class="font-semibold text-gray-100">${step.card.name}</h4>`;
-    html += `<p class="text-gray-300 text-sm leading-relaxed">${step.card.core_theme.neutral} integrates with the existing pattern.</p>`;
+    html += `<li><div class="text-gray-300 text-sm leading-relaxed"><strong>${step.card.name}</strong> joins the story, emphasizing <em>${step.card.core_theme.neutral}</em>.`;
     if (step.connections.length) {
       const conns = step.connections.map(c => {
         const desc = c.link.types.join(', ');
         const weight = getWeightDescription(c.link.weight);
         return `${c.other.name} via <em>${desc}</em> (<strong>${weight}</strong>)`;
       }).join('; ');
-      html += `<p class="text-sm text-gray-300 pl-4">Connected to ${conns}.</p>`;
+      html += ` <span class="block pl-4">Connected to ${conns}.</span>`;
     }
-    html += '</div>';
+    html += '</div></li>';
   });
+  html += '</ol>';
 
   const values = Object.entries(combined).filter(([, v]) => v !== 0);
   const pos = values.filter(([, v]) => v > 0).slice(0,3).map(([k]) => k);
