@@ -330,56 +330,34 @@ function lookupLink(id1, id2, all){
   }) || null;
 }
 
-function buildConstellation(cards, allLinks) {
-  const root = cards[0];
-  const combined = { ...root.archetypal_principles };
-  const steps = [];
-  for (let i = 1; i < cards.length; i++) {
-    const card = cards[i];
-    const connections = [];
-    for (let j = 0; j < i; j++) {
-      const other = cards[j];
-      const link = lookupLink(card.id, other.id, allLinks);
-      if (link) connections.push({ other, link });
+
+function buildConnectionsSummary(cards, allLinks){
+  if(cards.length<2) return "";
+  let html = `<h2 class="text-2xl mb-4">Card Connections</h2>`;
+  html += '<ul class="space-y-2">';
+  for(let i=0;i<cards.length;i++){
+    for(let j=i+1;j<cards.length;j++){
+      const c1 = cards[i];
+      const c2 = cards[j];
+      const link = lookupLink(c1.id,c2.id,allLinks);
+      if(link){
+        const desc = link.types.join(", ");
+        const weight = getWeightDescription(link.weight);
+        html += `<li><strong style="color:${c1.color}">${c1.name}</strong> ↔ <strong style="color:${c2.color}">${c2.name}</strong>: ${desc} (<em>${weight}</em>)</li>`;
+      }else{
+        html += `<li><strong style="color:${c1.color}">${c1.name}</strong> ↔ <strong style="color:${c2.color}">${c2.name}</strong>: <em>No direct link</em></li>`;
+      }
     }
-    steps.push({ card, connections });
-    Object.entries(card.archetypal_principles).forEach(([k, v]) => {
-      combined[k] = (combined[k] || 0) + v;
+  }
+  html += "</ul>";
+  const combined = {};
+  cards.forEach(c=>{
+    Object.entries(c.archetypal_principles).forEach(([k,v])=>{
+      combined[k]=(combined[k]||0)+v;
     });
-  }
-  return { root, steps, combined };
-}
-
-function renderConstellation(data) {
-  if (!data) return '';
-  const { root, steps, combined } = data;
-
-  let html = `<h2 class="text-2xl mb-4">Constellation Starting With <span class="font-bold title-font text-xl" style="color:${root.color};">${root.name}</span></h2>`;
-  html += '<ol class="list-decimal list-inside space-y-4">';
-  html += `<li><div class="text-gray-300 text-sm leading-relaxed"><strong>${root.name}</strong> sets the tone with <em>${root.core_theme.neutral}</em>.</div></li>`;
-
-  steps.forEach(step => {
-    html += `<li><div class="text-gray-300 text-sm leading-relaxed"><strong>${step.card.name}</strong> joins the story, emphasizing <em>${step.card.core_theme.neutral}</em>.`;
-    if (step.connections.length) {
-      const conns = step.connections.map(c => {
-        const desc = c.link.types.join(', ');
-        const weight = getWeightDescription(c.link.weight);
-        return `${c.other.name} via <em>${desc}</em> (<strong>${weight}</strong>)`;
-      }).join('; ');
-      html += ` <span class="block pl-4">Connected to ${conns}.</span>`;
-    }
-    html += '</div></li>';
   });
-  html += '</ol>';
-
-  const values = Object.entries(combined).filter(([, v]) => v !== 0);
-  const pos = values.filter(([, v]) => v > 0).slice(0,3).map(([k]) => k);
-  const neg = values.filter(([, v]) => v < 0).slice(0,3).map(([k]) => k);
-  if (pos.length || neg.length) {
-    html += `<h3 class="font-bold title-font text-lg text-gray-100 mt-6 mb-2">Overall Archetypal Currents</h3>`;
-    html += summarizePrinciples(combined);
-  }
-
+  html += `<h3 class="font-bold title-font text-lg text-gray-100 mt-6 mb-2">Overall Archetypal Currents</h3>`;
+  html += summarizePrinciples(combined);
   return html;
 }
 
@@ -606,7 +584,7 @@ function updateNarrative() {
     return;
   }
   if (selectionHistory.length>1) {
-    narrativeTabs.append('div').attr('class','narrative-tab active').attr('data-target','pane-constellation').text('Constellation');
+    narrativeTabs.append('div').attr('class','narrative-tab active').attr('data-target','pane-connections').text('Connections');
   }
   selectionHistory.forEach(card => {
     narrativeTabs.append('div').attr('class', `narrative-tab ${selectionHistory.length===1?'active':''}`)
@@ -616,11 +594,11 @@ function updateNarrative() {
   narrativeTabs.append('div').attr('class','narrative-tab')
     .attr('data-target','pane-glossary').text('Glossary');
   if (selectionHistory.length>1) {
-    const constellationData = buildConstellation(selectionHistory, links);
+    const connectionsHtml = buildConnectionsSummary(selectionHistory, links);
     narrativeContentArea.append('div')
-      .attr('id','pane-constellation')
+      .attr('id','pane-connections')
       .attr('class','narrative-pane active')
-      .html(renderConstellation(constellationData));
+      .html(connectionsHtml);
   }
   selectionHistory.forEach(card => {
     narrativeContentArea.append('div').attr('id',`pane-${card.id}`)
